@@ -531,9 +531,24 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - Canlı 200/307/400/401/403/413/415/201 davranışları; API ID `MwjUZLzA1VyNO4YOKNRd` ile Firestore geri okuma ve yenileme sonrası kalıcılık → ✅.
 - Canlı tarayıcı gönderiliyor/başarı/form temizliği; UI ID `nytNIK9m696ifBlVqqQ6` ile Firestore eşleştirmesi; anonim Firestore okuma 403; mobil menü arka plan izolasyonu/Escape/focus ve tablet görünümü → ✅.
 - `LIVE_VERIFICATION.json` ve `docs/live-success.jpg`: yalnızca kurgusal test kanıtı; mevcut kayıtlar silinmedi.
-- GitHub CI ilk temiz kurulumda typecheck aşamasında `Cannot find name LayoutProps` hatası verdi → ❌. Yerel build'in ürettiği tipler eksikliği gizliyordu; `next typegen && tsc --noEmit` ile düzeltildi, yerel typecheck/lint tekrar geçti → ✅. İkinci push sonrası CI sonucu ayrıca doğrulanacak.
+- GitHub CI ilk temiz kurulumda typecheck aşamasında `Cannot find name LayoutProps` hatası verdi → ❌. Yerel build'in ürettiği tipler eksikliği gizliyordu; `next typegen && tsc --noEmit` ile düzeltildi, yerel typecheck/lint tekrar geçti → ✅.
+- İkinci push: `cb9779c2c248980cf1c5b84b74b616ca188bcf38` commit'inde [GitHub Actions 36866874449](https://github.com/menesyilm/akis/actions/runs/36866874449) completed/success; production health aynı SHA → ✅. Son belge commit'i sonrası aynı SHA kontrolü teslim raporunda ayrıca yapılacak.
 
 ### Son yeniden tarama ve sınırlar
 - Ana gereksinimlerde bilinen açık çalışmama bulgusu kalmadı. Sıfır hata garantisi verilmedi; gerçek admin hesabı şifresiyle giriş/silme, tam ekran okuyucu/cihaz matrisi ve adayın geçmiş proje bilgileri bu oturumda test edilmedi veya uydurulmadı.
 - Dağıtık rate limiting, idempotency ve 100 kayıt sonrası sayfalama belgeli kapsam sınırlarıdır; bunlar temel değerlendirme gereksinimleri değil.
 - Toplam süre beyanı: önceki kayıtlı yaklaşık 4 saate bu son oturumun duvar süresi ayrıca eklenir; eksiksiz aktif emek toplamı diye sunulmaz.
+
+## 2026-10-01 — Son teslim belgelerinin kaydı
+
+**Araç:** Codex; Git/GitHub API ve public production health.
+**Süre:** Son iyileştirme oturumunun başlangıcı 15:51 Europe/Istanbul; belge kaydı 16:14 civarında tamamlandı. Yaklaşık 23 dakika duvar süresi; deployment/CI beklemelerini içerir, aktif emek ölçümü değildir.
+
+### İstek ve karar
+- Kullanıcının açık commit/push talimatıyla doğrulanmış test ve canlı kayıt kanıtları repoya eklendi. Ürüne yeni kapsam eklemek yerine son belgeler doğrulama sonuçlarıyla tamamlandı.
+- Nihai teslim SHA'sı kendi commit'inin içine yazılmadı; son push sonrası health endpoint'i ve GitHub üzerinden kontrol edilip kullanıcıya verilecek.
+
+### Doğrulama ve kalan
+- 36/36 test; lint/typecheck/build; temiz Linux CI ve production commit eşleşmesi → ✅ Önceki kaynak commit'inde doğrulandı.
+- Canlı form/API/Firestore kalıcılık kanıtı → ✅ `LIVE_VERIFICATION.json` ve `docs/live-success.jpg` içinde.
+- Bu commit yalnızca son belge güncellemesini içerir. Son push/deployment SHA ve CI durum kontrolü teslim cevabından önce yapılacak; temel görev kapsamındaki bilinen çalışmama sorunu kalmadı.

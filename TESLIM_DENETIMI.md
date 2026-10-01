@@ -14,7 +14,8 @@
 - Canlı API: 200 landing/login, 307 admin redirect, 400 validation/bozuk JSON, 413 büyük gövde, 415 content type, 401 anonim silme, 403 cross-origin session, 201 kalıcı kayıt doğrulandı.
 - Firestore: API kaydı `MwjUZLzA1VyNO4YOKNRd` ve tarayıcı kaydı `nytNIK9m696ifBlVqqQ6` geri okundu; yeniden yükleme sonrası kalıcılık ve anonim Firestore okumasının 403 ile reddi doğrulandı. Yalnızca kurgusal veriler kullanıldı, mevcut kayıtlar silinmedi.
 - Canlı tarayıcı: gönderiliyor/başarı/form temizliği, mobil modal menü/Escape/focus, boş form hata/focus ve 375/768 px kontrolü başarılı. Kanıt: `LIVE_VERIFICATION.json`, `docs/live-success.jpg`.
-- CI ilk temiz kurulumda `LayoutProps` tipinin üretilmemesi hatasını buldu. Typecheck `next typegen && tsc --noEmit` olarak düzeltildi; son CI sonucu ikinci push sonrasında kontrol edilecek.
+- CI ilk temiz kurulumda `LayoutProps` tipinin üretilmemesi hatasını buldu. Typecheck `next typegen && tsc --noEmit` olarak düzeltildi. `cb9779c2c248980cf1c5b84b74b616ca188bcf38` commit'inde GitHub Actions [36866874449](https://github.com/menesyilm/akis/actions/runs/36866874449) success; production health aynı SHA'yı döndürdü.
+- Bu sonuçlar kaydedildikten sonraki commit yalnızca belge güncellemesidir; nihai SHA teslim alanında belirtilecek ve son push sonrası production health ile yeniden eşleştirilecek.
 - Rate limiting, idempotency ve sayfalama isteğe bağlı ürün geliştirmeleri olarak belgeli sınırlar; geçmiş proje/gerçek toplam emek ve eski anahtar iptali koddan bağımsız aday/account bilgileri olduğundan uydurulmadı.
 
 Bu rapor kullanıcının paylaştığı görev metni, mevcut kaynak kod, Git geçmişi, otomatik kontroller ve canlı tarayıcı kontrollerine dayanır. Ayrıntılı değerlendirme rehberi bağlantısı web aracında açılamadı, tarayıcıda `ERR_BLOCKED_BY_CLIENT` döndü; içeriği okunmuş veya ek ölçütleri karşılanmış sayılmadı. Puan tahmini veya işe alım sonucu üretilmedi.

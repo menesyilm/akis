@@ -181,3 +181,5 @@ Node.js 24 ile `npm ci`, `.env.example` → `.env.local`, Firebase ayarları ve 
 Canlı test: `node scripts/verify-live.mjs https://enteksis-akis.vercel.app BEKLENEN_COMMIT_SHA`. Bu komut yalnızca kurgusal bir talep kaydı oluşturur, dönen ID ile Firestore geri okumasını ve yenileme sonrası kalıcılığı doğrular; mevcut kayıtları silmez. Firebase Admin kimlik bilgileri yalnızca yerel `.env.local` içinden okunur. `LIVE_VERIFICATION.json` kanıt dosyasında sır veya gerçek kişi bilgisi bulunmaz.
 
 `/api/health` yalnızca yayın durumunu ve `VERCEL_GIT_COMMIT_SHA` değerini döndürür; teslim SHA eşleşmesini buradan kontrol edebilirsiniz.
+
+Temiz Linux kurulumunda GitHub Actions doğrulaması başarılı: [CI koşusu](https://github.com/menesyilm/akis/actions/runs/36866874449). İlk CI denemesinde yakalanan `LayoutProps` üretim eksikliği `next typegen` ile giderildi. Son belge commit'inden sonra teslim SHA'sı production health ile yeniden eşleştirilir.
