@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
 
 const directions = {
@@ -28,16 +28,17 @@ export default function Reveal({
   duration = 0.7,
   style,
 }: RevealProps) {
+  const reducedMotion = useReducedMotion();
   return (
     <motion.div
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: false, amount: 0.12 }}
-      variants={directions[variant]}
+      variants={reducedMotion ? { visible: { opacity: 1, x: 0, y: 0, scale: 1 } } : directions[variant]}
       transition={{
-        duration,
+        duration: reducedMotion ? 0 : duration,
         ease: [0.16, 1, 0.3, 1],
-        delay,
+        delay: reducedMotion ? 0 : delay,
       }}
       className={className}
       style={style}

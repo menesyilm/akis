@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getVerifiedAdminSession } from "@/lib/server/admin-session";
 import { deleteServiceRequest } from "@/lib/server/request-repository";
+import { logServerError } from "@/lib/server/error-log";
 
 export const runtime = "nodejs";
 
@@ -40,8 +41,8 @@ export async function DELETE(
       status: 204,
       headers: { "Cache-Control": "no-store" },
     });
-  } catch {
-    console.error("Talep Firestore'dan silinemedi.");
+  } catch (error) {
+    logServerError("requests.delete", error);
     return jsonError("Talep silinemedi. Lütfen yeniden deneyin.", 500);
   }
 }

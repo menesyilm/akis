@@ -25,7 +25,7 @@ Akış, sipariş takibi, otomatik raporlama ve görev/hatırlatma süreçlerini 
 - **Veritabanı:** Firebase Firestore (Sunucu taraflı güvenli kalıcı kayıt)
 - **Kimlik Doğrulama:** Firebase Authentication (Admin oturumu + `HttpOnly` güvenli cookie)
 - **Sunucu SDK:** Firebase Admin SDK (`server-only` mimarisiyle izole)
-- **Test:** Vitest (14/14 birim ve API entegrasyon testi)
+- **Test:** Vitest (36/36 şema, mock API ve runtime uyumluluk testi)
 - **Dağıtım & Analitik:** Vercel + Vercel Analytics
 
 ---
@@ -71,7 +71,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=replace-with-firebase-web-app-id
 ```bash
 git clone https://github.com/menesyilm/akis.git
 cd akis
-npm install
+npm ci
 ```
 
 ### 2. Ortam dosyasını oluşturun:
@@ -125,15 +125,20 @@ Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açın.
 - **Güvenli Oturum:** Sunucu ID token'ı doğrular ve `ADMIN_EMAIL` allowlist listesinde olup olmadığını kontrol eder. Uygunsa 5 günlük `HttpOnly`, `Secure`, `SameSite=Lax` oturum çerezi (`akis_admin_session`) üretir.
 - **Yetkisiz Erişim Koruması:** `/admin` rotasına gelen oturumsuz istekler doğrudan `/login`'e yönlendirilir.
 - **Talep Yönetimi:** Yönetici panelinde son 100 talep tarih, isim, e-posta, hizmet türü ve durumuna göre listelenir.
+- **Silme:** Yönetici oturumu ve aynı kaynak kontrolü gerektiren `DELETE /api/admin/requests/[requestId]`, onay penceresinden sonra kaydı kalıcı siler.
+
+Firebase Authentication'da Email/Password sağlayıcısını etkinleştirin; yönetici hesabını oluşturup e-postasını `ADMIN_EMAIL` listesine ekleyin. Şifre veya servis hesabı anahtarını README'ye koymayın. `firestore.rules` istemci erişimini kapatır; dosyanın repoda bulunması kuralları otomatik yayımlamaz. Firebase Console'da kuralları ayrıca yayımlayın. Admin SDK erişimi servis hesabının IAM yetkileriyle sağlanır.
 
 ---
 
 ## 🧪 Testler ve Doğrulama Kanıtı
 
-Test süiti [tests/](file:///c:/codes/enteksis/akis/tests) dizininde yer almakta olup `npm run test` ile çalıştırılır:
+Test süiti [tests/](./tests) dizininde yer almakta olup `npm run test` ile çalıştırılır:
 - **Şema Testleri (`tests/request-schema.test.ts`):** 8 test (Geçerli veri, trim, kısa/uzun ad, geçersiz e-posta, geçersiz hizmet, kısa/uzun açıklama).
 - **API Rota Testleri (`tests/requests-route.test.ts`):** 6 test (415 Content-Type, 400 bozuk JSON, 400 honeypot, 400 validasyon, 201 başarılı kayıt, 500 DB hatasında iç detay ifşa etmeme).
-- **Sonuç:** 14/14 test başarıyla geçmektedir.
+- **Runtime Uyumluluk Testi (`tests/firebase-runtime.test.ts`):** `require(ESM)` kapalıyken Firebase Admin yükleme, JWKS anahtarıyla imza doğrulama ve değiştirilmiş token reddi.
+- **Sonuç:** 2026-10-01 yeniden kontrolünde 5 dosya, 36/36 test; lint, typecheck ve production build başarılı.
+- API testleri repository'yi mock eder; gerçek Firestore yazma ve kalıcılık kanıtı yerine geçmez.
 
 ---
 
@@ -143,3 +148,34 @@ Tüm geliştirme süreci, AI yönlendirmeleri, kabul edilen/reddedilen mimari ka
 
 - **Proje Planı ve Yönerge:** [`AKIS_PROJE_PLANI.md`](./AKIS_PROJE_PLANI.md)
 - **AI Karar Günlüğü:** [`AI_LOG.md`](./AI_LOG.md)
+
+## Başlangıç kaynağı ve katkı ayrımı
+
+- Git geçmişindeki ilk commit `Initial commit from Create Next App`: başlangıç scaffold'ı [create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app) ile üretildi.
+- Next.js, React, Firebase, Zod, Framer Motion ve Vercel Analytics açık kaynak/sağlayıcı bağımlılıklarıdır. Landing page içeriği ve tasarımı, form/API, Firestore repository, yönetici akışı, testler ve belgeler proje kapsamında AI desteğiyle geliştirildi.
+- Codex ve Antigravity ile yapılan işler ve adayın bildirdiği kararlar AI_LOG'da kayıtlıdır. Aday teslimden önce araç/model isimleri, kendi katkıları ve karar ifadelerini doğrulamalıdır; günlükteki geçmiş kayıtlar bu denetimde bağımsız doğrulanmış sayılmadı.
+
+## Vercel runtime uyumluluğu
+
+`firebase-admin → jwks-rsa → jose` zincirinde `ERR_REQUIRE_ESM` hatası Vercel runtime loglarıyla belirlendi. Node.js `24.x` seçimi tek başına yeterli olmadı; `package.json` içindeki scoped override yalnızca `jwks-rsa` altında `jose@5.10.0` kullanır. Node.js 24'te `--no-experimental-require-module` ile sorun yeniden üretilip düzeltme test edildi. Kullanıcı düzeltmeden sonra canlı sorunun çözüldüğünü bildirdi; bu denetimde canlı login ekranı da açıldı.
+
+## Bilinen sınırlar ve teslim kanıtı
+
+- Dağıtık rate limiting, CAPTCHA ve idempotency yoktur. Honeypot ve butonun gönderim sırasında kapatılması tam spam/tekrar kayıt koruması değildir. Ağ yanıtı kaybolursa tekrar gönderim ikinci kayıt oluşturabilir.
+- Yönetici paneli son 100 kaydı listeler; sayfalama ve arama yoktur. Silme kalıcıdır.
+- Vurgu metni `#596544` ile yaklaşık 5.69:1 kontrasta sahiptir. Framer Motion reduced-motion tercihini kullanır; SSR içeriği başlangıçta gizlenmez. Mobil menü native modal dialog ile arka planı erişilebilirlik ağacından ayırır.
+- Firebase hataları kullanıcıya genel mesaj olarak döner. Sunucu loglarına yalnızca işlem adı ve sınırlı SDK hata kodu yazılır; mesaj, token, anahtar ve kişisel veri yazılmaz. Altyapı kaynaklı session hataları 503, geçersiz token 401 döner.
+- Bu denetimde gerçek admin hesabıyla giriş/silme, Firestore belge ID'siyle geri okuma ve yeniden yükleme sonrası kalıcılık bağımsız olarak sınanmadı. Kullanıcının canlı sorunun çözüldüğü beyanı bu kontrollerin kanıtı yerine yazılmadı.
+- Yalnızca kurgusal test verisi kullanın: örneğin `Deneme Kullanıcısı`, `deneme@example.com`. Teslimde formun döndürdüğü kayıt ID'sini Firestore belgesiyle eşleştirin, yenilemeden sonra kaldığını doğrulayın; gerçek kişisel verileri kanıta eklemeyin.
+- Önceki AI_LOG sürelerinin çakışmalar çıkarılmış toplamı yaklaşık 4 saattir; bu, süresi yazılmayan aşamaları kapsayan eksiksiz aktif emek ölçümü değildir. Son teslim iyileştirme oturumu ayrıca günlüğe kaydedilir.
+- Teslim commit kimliği son dokümantasyon değişiklikleri commit edilip pushlandıktan sonra `git rev-parse HEAD` ile alınarak teslim alanında belirtilir. Vercel production deployment'ın aynı commit'ten çıktığı kontrol edilir; bu belgenin içine kendi commit SHA'sı yazılmaz.
+
+Ayrıntılı gereksinim eşleştirmesi ve öncelikler: [TESLIM_DENETIMI.md](./TESLIM_DENETIMI.md).
+
+## Teslim doğrulamasını tekrar çalıştırma
+
+Node.js 24 ile `npm ci`, `.env.example` → `.env.local`, Firebase ayarları ve `npm run dev`. Kontroller: `npm run test`, `npm run lint`, `npm run typecheck`, `npm run build`. GitHub Actions aynı kontrolleri push ve PR üzerinde çalıştırır.
+
+Canlı test: `node scripts/verify-live.mjs https://enteksis-akis.vercel.app BEKLENEN_COMMIT_SHA`. Bu komut yalnızca kurgusal bir talep kaydı oluşturur, dönen ID ile Firestore geri okumasını ve yenileme sonrası kalıcılığı doğrular; mevcut kayıtları silmez. Firebase Admin kimlik bilgileri yalnızca yerel `.env.local` içinden okunur. `LIVE_VERIFICATION.json` kanıt dosyasında sır veya gerçek kişi bilgisi bulunmaz.
+
+`/api/health` yalnızca yayın durumunu ve `VERCEL_GIT_COMMIT_SHA` değerini döndürür; teslim SHA eşleşmesini buradan kontrol edebilirsiniz.

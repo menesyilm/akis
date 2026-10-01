@@ -20,9 +20,14 @@ export default function SiteNav() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    const dialog = dialogRef.current;
+    const toggle = toggleRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -51,6 +56,8 @@ export default function SiteNav() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => {
+      dialog?.close();
+      toggle?.focus();
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -86,7 +93,8 @@ export default function SiteNav() {
       </button>
 
       {isOpen && (
-        <div className="mobile-nav-layer">
+        <dialog aria-label="Mobil gezinme" className="mobile-nav-layer" ref={dialogRef}
+          onCancel={(event) => { event.preventDefault(); closeMenu(); }}>
           <button
             aria-label="Menüyü kapat"
             className="nav-backdrop"
@@ -117,7 +125,7 @@ export default function SiteNav() {
             </nav>
             <p className="sidebar-note">Tekrarlayan işleri otomatikleştirin, işinize zaman ayırın.</p>
           </aside>
-        </div>
+        </dialog>
       )}
     </>
   );

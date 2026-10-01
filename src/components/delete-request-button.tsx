@@ -62,7 +62,10 @@ export default function DeleteRequestButton({ requestId }: DeleteRequestButtonPr
       <dialog
         aria-labelledby={`delete-request-title-${requestId}`}
         className="delete-request-dialog"
-        onCancel={() => setErrorMessage("")}
+        onCancel={(event) => {
+          if (isDeleting) event.preventDefault();
+          else setErrorMessage("");
+        }}
         ref={dialogRef}
       >
         <section className="delete-request-content">

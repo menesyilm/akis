@@ -1,3 +1,4 @@
+import { services } from "@/lib/services";
 import SiteNav from "@/components/site-nav";
 import Reveal from "@/components/reveal";
 import HeroCards from "@/components/hero-cards";
@@ -5,29 +6,6 @@ import ServiceGrid from "@/components/service-grid";
 import StepsList from "@/components/steps-list";
 import RequestForm from "@/components/request-form";
 
-const services = [
-  {
-    number: "01",
-    title: "Sipariş takibi",
-    description:
-      "Farklı kanallardan gelen siparişleri tek bir akışta toplayın. Ekibiniz, her işin hangi aşamada olduğunu kolayca görsün.",
-    icon: "↗",
-  },
-  {
-    number: "02",
-    title: "Raporlama",
-    description:
-      "Tekrarlanan rapor hazırlığını otomatikleştirin. İhtiyacınız olan bilgiler, doğru zamanda ve düzenli biçimde elinizde olsun.",
-    icon: "▤",
-  },
-  {
-    number: "03",
-    title: "Görev ve hatırlatma",
-    description:
-      "İşleri doğru kişiye, doğru zamanda ulaştırın. Takip gerektiren adımlar gözden kaçmasın.",
-    icon: "◷",
-  },
-];
 
 const steps = [
   {
@@ -123,7 +101,7 @@ export default function Home() {
           </div>
         </Reveal>
 
-        <ServiceGrid services={services} />
+        <ServiceGrid services={services.map((service, index) => ({ ...service, number: String(index + 1).padStart(2, "0") }))} />
       </section>
 
       <section className="process" id="surec" aria-labelledby="process-title">

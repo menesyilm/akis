@@ -171,14 +171,14 @@ export default function RequestForm() {
         setResultNotice({
           title: "İstek zaman aşımına uğradı",
           statusCode: null,
-          message: "Sunucudan yanıt alınamadı. Kayıt oluşmuş olabileceğinden tekrar göndermeden önce Firestore'u kontrol edin.",
+          message: "Sunucudan yanıt alınamadı. Talebiniz kaydedilmiş olabilir. Tekrar göndermeden önce destek ekibiyle kayıt durumunu kontrol edin.",
           success: false,
         });
       } else {
         setResultNotice({
           title: "Bağlantı hatası",
           statusCode: null,
-          message: "Sunucuya ulaşılamadı. Kayıt oluşmuş olabileceğinden tekrar göndermeden önce kontrol edin.",
+          message: "Sunucuya ulaşılamadı. Talebiniz kaydedilmiş olabilir. Tekrar göndermeden önce destek ekibiyle kayıt durumunu kontrol edin.",
           success: false,
         });
       }
@@ -202,7 +202,7 @@ export default function RequestForm() {
 
   return (
     <>
-      <form className="request-form" onSubmit={handleSubmit} noValidate>
+      <form aria-busy={submissionState === "submitting"} className="request-form" onSubmit={handleSubmit} noValidate>
       <div className="form-row">
         <div className="form-field">
           <label htmlFor={fieldIds.name}>Adınız</label>
@@ -276,6 +276,9 @@ export default function RequestForm() {
       </button>
 
       </form>
+      <p className="sr-only" role="status" aria-live="polite">
+        {submissionState === "submitting" ? "Talebiniz gönderiliyor. Lütfen bekleyin." : ""}
+      </p>
 
       <dialog
         aria-labelledby="request-result-title"
@@ -300,9 +303,6 @@ export default function RequestForm() {
             </span>
             <div className="result-dialog-heading">
               <h2 id="request-result-title">{resultNotice.title}</h2>
-              <span className="result-dialog-code">
-                {resultNotice.statusCode === null ? "HTTP yanıtı yok" : `HTTP ${resultNotice.statusCode}`}
-              </span>
             </div>
             <p className="result-dialog-message" id="request-result-message">{resultNotice.message}</p>
             {resultNotice.requestId && (

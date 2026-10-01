@@ -6,6 +6,8 @@ import {
   isConfiguredAdminEmail,
 } from "@/lib/server/admin-session";
 import { getAdminAuth } from "@/lib/server/firebase-admin";
+import { logServerError, serverErrorCode } from "@/lib/server/error-log";
+import { readJsonBody, PayloadTooLargeError } from "@/lib/server/json-body";
 
 export const runtime = "nodejs";
 
@@ -35,8 +37,9 @@ export async function POST(request: Request) {
 
   let body: unknown;
   try {
-    body = await request.json();
-  } catch {
+    body = await readJsonBody(request);
+  } catch (error) {
+    if (error instanceof PayloadTooLargeError) return jsonError("Giriş isteği çok büyük.", 413);
     return jsonError("Giriş isteği okunamadı.", 400);
   }
 
@@ -67,7 +70,15 @@ export async function POST(request: Request) {
       maxAge: ADMIN_SESSION_DURATION_MS / 1000,
     });
     return response;
-  } catch {
-    return jsonError("Giriş doğrulanamadı. Bilgilerinizi kontrol edip yeniden deneyin.", 401);
+  } catch (error) {
+    logServerError("auth.session", error);
+    const invalidTokenCodes = new Set([
+      "auth/argument-error", "auth/invalid-id-token", "auth/id-token-expired",
+      "auth/id-token-revoked", "auth/user-disabled", "auth/user-not-found",
+    ]);
+    if (invalidTokenCodes.has(serverErrorCode(error))) {
+      return jsonError("Giriş doğrulanamadı. Bilgilerinizi kontrol edip yeniden deneyin.", 401);
+    }
+    return jsonError("Oturum hizmetine şu anda ulaşılamıyor. Lütfen daha sonra yeniden deneyin.", 503);
   }
 }

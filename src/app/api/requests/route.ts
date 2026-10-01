@@ -2,42 +2,11 @@ import { NextResponse } from "next/server";
 
 import { requestSchema } from "@/lib/request-schema";
 import { createServiceRequest } from "@/lib/server/request-repository";
+import { logServerError } from "@/lib/server/error-log";
+
+import { MAX_BODY_BYTES, PayloadTooLargeError, readJsonBody } from "@/lib/server/json-body";
 
 export const runtime = "nodejs";
-
-const MAX_BODY_BYTES = 16 * 1024;
-
-class PayloadTooLargeError extends Error {}
-
-async function readJsonBody(request: Request): Promise<unknown> {
-  const reader = request.body?.getReader();
-  if (!reader) throw new SyntaxError("Missing request body.");
-
-  const chunks: Uint8Array[] = [];
-  let totalBytes = 0;
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (!value) continue;
-
-    totalBytes += value.byteLength;
-    if (totalBytes > MAX_BODY_BYTES) {
-      await reader.cancel();
-      throw new PayloadTooLargeError();
-    }
-    chunks.push(value);
-  }
-
-  const body = new Uint8Array(totalBytes);
-  let offset = 0;
-  for (const chunk of chunks) {
-    body.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-
-  return JSON.parse(new TextDecoder().decode(body)) as unknown;
-}
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ success: false, error: message }, { status });
@@ -85,8 +54,8 @@ export async function POST(request: Request) {
   try {
     const requestId = await createServiceRequest(parsed.data);
     return NextResponse.json({ success: true, requestId }, { status: 201 });
-  } catch {
-    console.error("Talep Firestore'a kaydedilemedi.");
+  } catch (error) {
+    logServerError("requests.create", error);
     return jsonError("Talebiniz şu anda kaydedilemedi. Lütfen biraz sonra yeniden deneyin.", 500);
   }
 }

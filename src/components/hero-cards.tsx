@@ -1,10 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const springTransition = { type: "spring", stiffness: 260, damping: 20 } as const;
 
 export default function HeroCards() {
+  const reducedMotion = useReducedMotion();
   return (
     <div className="hero-art" aria-hidden="true">
       <div className="art-orbit orbit-one" />
@@ -12,7 +13,7 @@ export default function HeroCards() {
 
       <motion.div
         className="flow-card card-back"
-        whileHover={{ y: -10, rotate: 7 }}
+        whileHover={reducedMotion ? undefined : { y: -10, rotate: 7 }}
         transition={springTransition}
       >
         <span className="flow-label">BUGÜNÜN AKIŞI</span>
@@ -23,7 +24,7 @@ export default function HeroCards() {
 
       <motion.div
         className="flow-card card-front"
-        whileHover={{ y: -10, rotate: -6 }}
+        whileHover={reducedMotion ? undefined : { y: -10, rotate: -6 }}
         transition={springTransition}
       >
         <span className="card-spark">✳</span>

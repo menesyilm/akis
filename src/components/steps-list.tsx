@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface StepItem {
   number: string;
@@ -19,10 +19,11 @@ const stepVariants = {
 };
 
 export default function StepsList({ steps }: { steps: StepItem[] }) {
+  const reducedMotion = useReducedMotion();
   return (
     <motion.ol
       className="steps-list"
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: false, amount: 0.2 }}
       variants={listVariants}
@@ -32,7 +33,7 @@ export default function StepsList({ steps }: { steps: StepItem[] }) {
           className="step"
           key={step.number}
           variants={stepVariants}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: reducedMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="step-number">{step.number}</span>
           <div>

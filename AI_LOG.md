@@ -425,3 +425,106 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - `npm run typecheck` → ✅ Başarılı.
 - `npm run test` → ✅ 14/14 test geçti.
 - `git status` & `git ls-files .env.example` → ✅ `.env.example` takipli ve depoda mevcut.
+
+---
+
+## 2026-10-01 — Vercel Firebase Admin ESM hatasının çözülmesi ve MCP yedek planı
+
+**Araç:** Codex; kullanıcı tarafından paylaşılan Vercel runtime logları. Kullanıcı ayrıca Codex–Vercel MCP bağlantısı kurduğunu bildirdi.
+**Süre:** Toplam aktif süre ölçülmedi; adayın gerçek süre beyanı bekleniyor. Bu kayıt sorunun çözülmesinden sonra kullanıcının isteğiyle eklendi.
+
+### İstek
+- Localde çalışan talep formu ve login Vercel'de hata veriyordu; kullanıcı logları paylaşarak nedeni bulup düzeltmemi istedi.
+- Kullanıcı son düzeltmeden sonra sorunun çözüldüğünü ve artık problem kalmadığını bildirdi; çözüm sürecini ve MCP yedek planını günlüğe eklememi istedi.
+
+### AI önerisi → Kararım
+- İlk environment/private key biçimi ve redeploy kontrolleri yapıldı; kullanıcı bunları uygulamasına rağmen hata sürdü. Bunlar nihai çözüm olarak kaydedilmedi.
+- Vercel logunda `firebase-admin/auth → jwks-rsa/src/utils.js → jose/dist/webapi/index.js` zincirinde `ERR_REQUIRE_ESM` görüldü; teşhis ortam değişkeni eksikliğinden modül yükleme uyumsuzluğuna güncellendi.
+- AI Node.js 24'e sabitlemeyi önerdi; kullanıcı Vercel'in zaten 24.x olduğunu ve düzeltmenin yetmediğini bildirdi. Önceki öneri bu kanıtla değiştirildi.
+- AI yalnızca `jwks-rsa` altında `jose@5.10.0` scoped override önerdi; kullanıcı değişiklikleri pushlayıp canlı sorunun çözüldüğünü doğruladı. Amaç CommonJS uyumunu sağlamak ve etkisini ilgili bağımlılık zinciriyle sınırlamaktı.
+- Kullanıcı Codex ile Vercel arasında MCP bağlantısı kurduğunu, sorun sürseydi bu bağlantı üzerinden inceleteceğini belirtti. Nihai çözüm paylaşılan Vercel loglarıyla bulundu; bu çözüm sırasında Vercel MCP araçları çağrılmadı. Bağlantının bağımsız erişim testi bu denetimde yapılmadı.
+
+### Yapılan iş
+- `package.json`, `package-lock.json`: Node.js `24.x` tercihi ve `jwks-rsa` altında `jose@5.10.0` override eklendi.
+- `tests/firebase-runtime.test.ts`: `--no-experimental-require-module` altında Admin Auth/Firestore yükleme, JWKS imzası doğrulama ve değiştirilmiş token reddi regresyon testi eklendi.
+- Çözüm commit'i: `3025277f0a791da2cad5519fea57e56bc16cd926` (`fix: resolve Firebase Admin ESM loading failure on Vercel`).
+
+### Doğrulama
+- Node.js 24'te `require(ESM)` desteği kapatılarak aynı hata yeniden üretildi → ✅ `ERR_REQUIRE_ESM` görüldü. Bu, Vercel'in aynı bayrakla çalıştığını kesinleştirmez; hata koşulunu temsil eden testtir.
+- Scoped override sonrasında aynı koşulda modül yükleme ve imza testi → ✅ Başarılı.
+- Production yerel `/login` → ✅ HTTP 200/form; `/admin` → ✅ 307 `/login`.
+- 15/15 test, lint ve build → ✅ Başarılı.
+- Kullanıcının push/redeploy sonrası canlı çözüm beyanı → ✅ Sorun çözüldü; sonraki teslim denetiminde canlı login formu da açıldı.
+
+### Kalan
+- Bu runtime hatası için kullanıcının bildirdiği açık sorun kalmadı. Gerçek Firestore kalıcılık kanıtı ve teslim maddeleri ayrı denetimde ele alındı.
+
+---
+
+## 2026-10-01 — ENTEKSİS gereksinim ve teslim denetimi
+
+**Araç:** Codex; kaynak kod/Git incelemesi, Vitest/ESLint/TypeScript/Next.js kontrolleri, Codex tarayıcı araçları.
+**Süre:** Bu denetim için kesin aktif süre tutulmadı; projenin toplam aktif emek süresi kullanıcıdan istendi, uydurulmadı.
+
+### İstek
+- Projenin tamamını verilen ENTEKSİS görev ve puanlama metnine göre incele; eksikleri ve yapılabilecek iyileştirmeleri kullanıcıya sun, sonuçları AI_LOG'a kaydet.
+
+### AI önerisi → Kararım
+- AI mevcut ürün akışını kod kanıtı, kullanıcı beyanı ve doğrudan canlı test olarak ayrı değerlendirdi; mock testler Firestore kalıcılık kanıtı sayılmadı.
+- AI yeni özellik eklemek yerine eksik teslim belgelerini tamamladı; erişilebilirlik ve test boşluklarını önceliklendirdi. Bu denetimde uygulama davranışı değiştirilmedi.
+- Ayrıntılı değerlendirme rehberi web aracıyla açılamadı ve tarayıcıda `ERR_BLOCKED_BY_CLIENT` döndü; okunmuş gibi davranmak yerine kullanıcının paylaştığı görev metni esas alındı.
+
+### Yapılan iş
+- `README.md`: Test sayısı 15'e çıkarıldı; testlerin mock sınırı, scaffold/katkı kaynağı, Firebase Auth/Rules kurulumu, runtime çözümü, bilinen sınırlar ve teslim SHA adımları eklendi. Yerel `file://` test bağlantısı göreli bağlantıyla değiştirildi.
+- `TESLIM_DENETIMI.md`: Tüm gereksinimler ve yedi puanlama boyutu mevcut kanıtlarla eşleştirildi; teslim öncelikleri ve isteğe bağlı geliştirmeler kaydedildi.
+- `AI_LOG.md`: Runtime çözümü, yetersiz ilk hipotezler, kullanıcının canlı çözüm beyanı ve kullanılmayan MCP yedek planı kaydedildi; geçmiş günlük girdileri korunarak denetimin kanıt sınırı açıklandı.
+
+### Doğrulama
+- `npm run test` → ✅ 3 dosya, 15/15 test.
+- `npm run lint`, `npm run typecheck`, `npm run build` → ✅ Başarılı.
+- Canlı landing ve login → ✅ Açıldı; login sunucu hata ekranı görülmedi.
+- Canlı anonim `/admin` → ✅ `/login` adresine yönlendi; yönetici kayıtları gösterilmedi.
+- Canlı boş form → ✅ Doğrulama dialog'u, dört alan hata ilişkilendirmesi ve ilk hatalı alana focus dönüşü doğrulandı. Dialog'daki HTTP 400 etiketi istemci kaynaklı; sunucu 400 kanıtı diye kaydedilmedi.
+- 375 px mobil ve 768 px tablet → ✅ DOM ölçümünde kalıcı yatay taşma görülmedi; mobil menü açma/Escape/odak dönüşü sınandı. Tam cihaz/zoom/ekran okuyucu testi yapılmadı.
+- Kaynak erişimi güvenliği → ✅ `.env.local` ignore, `.env.example` takipli; secret değerleri rapora eklenmedi. Yayındaki Rules/IAM ve eski anahtarın iptali bağımsız sınanmadı.
+- Kontrast/reduced motion → ⚠️ `#99A579` / `#F5F5EF` yaklaşık 2.39:1; Framer Motion bileşenlerinde reduced-motion kontrolü yok. Kaynak incelemesiyle gerçek iyileştirme alanları belirlendi.
+
+### Kalan
+- Aynı kurgusal test kaydının 201 yanıtı/ID'si, Firestore geri okuması ve yeniden yükleme sonrası kalıcılığını teslim kanıtına eklemek; bu denetimde yeni kalıcı kayıt yazılmadı.
+- Toplam gerçek emek ve 24 saat penceresini adayın belirtmesi; son dokümantasyon commit/push sonrası nihai SHA'yı teslim alanına koyup production SHA ile eşleştirmek.
+- Kontrast ve Framer Motion reduced-motion desteğini iyileştirmek; 413/stream, repository çağrılmaması, yazma bitmeden başarı dönmemesi ve admin güvenlik testlerini değerlendirmek.
+- Değerlendirici repo erişimi, geçmiş proje/kişisel katkı ve geçmiş AI_LOG araç/model/karar ifadelerini adayın doğrulaması.
+
+---
+
+## 2026-10-01 — Teslim öncesi iyileştirmeler ve genişletilmiş doğrulama
+
+**Araç:** Codex; Vitest, ESLint, TypeScript, Next.js production build, Codex tarayıcı araçları, GitHub API.
+**Süre:** Oturum 15:51 (Europe/Istanbul) başladı; tamamlanma süresi canlı doğrulama sonunda kaydedilecek. Önceki günlük sürelerinin çakışmalar çıkarılmış toplamı yaklaşık 4 saat; eksiksiz aktif emek ölçümü değildir.
+
+### İstek
+- Önceki denetimde belirlenen eksiklik ve iyileştirmeleri tamamla, test et, GitHub'a pushla, canlı commit eşleşmesini doğrula ve teslim alanı için profesyonel metin hazırla.
+
+### AI önerisi → Kararım
+- Kontrast sorununu dekoratif paleti değiştirmeden metin için koyu yeşil ekleyerek çözdüm; vurgu kontrastı 5.69:1 oldu.
+- Motion bileşenlerinde reduced-motion tercihini kullandım ve SSR içeriğini görünür bıraktım; JavaScript olmadan içerik gizlenmemesi tercih edildi.
+- Mobil menüde native modal dialog kullandım; arka planın erişilebilirlik ağacından ayrılması, focus ve Escape davranışı korunması hedeflendi.
+- Yeni ürün özellikleri yerine güvenlik/test/teslim kanıtı tamamlandı; dağıtık rate limiting, idempotency ve admin sayfalama değerlendirme kapsamı dışında bilinen sınırlar olarak korundu.
+- Vercel MCP bağlantısı kullanıcı tarafından bildirilmiş olsa da bu oturumda çağrılabilir Vercel MCP araçları listelenmedi; bağlantı kullanılmış gibi yazılmadı. Public health endpoint'i ile yayın commit'i doğrulanacak.
+
+### Yapılan iş
+- Motion bileşenleri ve CSS: reduced-motion, görünür SSR, yüksek kontrast metin/placeholder/focus.
+- Mobil navigasyon: native dialog; form: aria-busy/live status, ziyaretçiye uygun belirsiz kayıt mesajı, teknik HTTP etiketlerinin kaldırılması.
+- Silme dialog'u: işlem sürerken Escape ile kapanmayı engelleme; landing hizmetlerinin ortak `services.ts` kaynağından alınması.
+- `error-log.ts`: yalnızca işlem ve SDK hata kodu; session altyapı hatası 503 ayrımı.
+- `json-body.ts`: talep ve oturum endpoint'lerinde ortak 16 KiB stream sınırı.
+- Testler: 413/header/stream, awaited persistence, allowlist/origin/token/cookie/logout/delete ve secret içermeyen log doğrulaması; toplam 36 test.
+- GitHub Actions: Node.js 24 üzerinde npm ci/test/lint/typecheck/build.
+- `scripts/verify-live.mjs`, `/api/health`: kurgusal kalıcılık kanıtı ve production SHA doğrulaması.
+
+### Doğrulama
+- 36/36 test, lint (uyarısız), typecheck ve production build → ✅ Başarılı.
+- Local production `require(ESM)` kapalıyken tarayıcıda boş form, native modal menü ve Escape → ✅ Çalıştı; 375 px yatay taşma görülmedi.
+- Public GitHub repo API → ✅ HTTP 200, public, varsayılan branch main.
+- Git tarafından takip edilen dosyalarda private key taraması → ✅ Bulgu yok; gerçek değerler çıktıya alınmadı.
+- Canlı commit ve gerçek Firestore kanıtı → ⏳ Push/deployment sonrası kaydedilecek.
