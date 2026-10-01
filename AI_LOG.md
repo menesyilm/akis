@@ -206,3 +206,25 @@ Talep formunun E2E testlerini gerçekleştir; HTTP 200/201, 400, 413, 415, 500 s
 - `npm run typecheck` → ✅ Sıfır hata
 - `npm run lint` → ✅ Sıfır hata
 - `npm run build` → ✅ Başarılı (statik sayfalar + dynamic route derlendi)
+
+---
+
+## 2026-10-01 13:00–13:02 — Teslim dokümantasyonu ve yeniden doğrulama
+
+**Araç:** Codex
+**İstek:** Test aşamasından sonra proje planındaki teslim aşamasına geç.
+
+### Karar
+- Canlı URL ve hesap ayarları repodan doğrulanamadı; bunları uydurmak yerine README'de canlı doğrulama bekliyor olarak belirttim.
+
+### Yapılan iş
+- `README.md`: create-next-app şablonu; ürün kapsamı, yerel kurulum, Firebase Admin ortam değişkenleri, test komutları, Vercel dağıtımı, canlı kontrol adımları ve bilinen sınırlarla değiştirildi.
+- Son commit ve çalışma ağacı kontrol edildi; bu aşama başlamadan önce çalışma ağacı temizdi.
+
+### Doğrulama
+- `npm run test` → ✅ 2 dosya, 14 test başarılı.
+- `npm run lint` → ✅ Başarılı.
+- `npm run typecheck` → ✅ Başarılı.
+- `npm run build` → ✅ Başarılı.
+- Bu kontrolde yerel `.env.local` içinde `FIREBASE_PROJECT_ID` var; `FIREBASE_CLIENT_EMAIL` ve `FIREBASE_PRIVATE_KEY` bulunmuyor. Değerler okunmadı veya yazdırılmadı.
+- Vercel canlı URL'si ve son deployment SHA'sı bu oturumda doğrulanmadı; teslim aşaması canlı kontrol bekliyor.
