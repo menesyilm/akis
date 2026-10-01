@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "Akış — İşiniz aksın, tekrarlar azalsın",
   description:
     "Sipariş takibi, raporlama ve günlük görevler için işletmenize uygun iş otomasyonu çözümleri.",
+  icons: {
+    icon: "/icon.svg",
+    apple: "/apple-icon.svg",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

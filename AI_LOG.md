@@ -228,3 +228,28 @@ Talep formunun E2E testlerini gerçekleştir; HTTP 200/201, 400, 413, 415, 500 s
 - `npm run build` → ✅ Başarılı.
 - Bu kontrolde yerel `.env.local` içinde `FIREBASE_PROJECT_ID` var; `FIREBASE_CLIENT_EMAIL` ve `FIREBASE_PRIVATE_KEY` bulunmuyor. Değerler okunmadı veya yazdırılmadı.
 - Vercel canlı URL'si ve son deployment SHA'sı bu oturumda doğrulanmadı; teslim aşaması canlı kontrol bekliyor.
+
+---
+
+## 2026-10-01 — Marka kimliğine uygun favicon ve sekme ikonu entegrasyonu
+
+**Araç:** Antigravity (Gemini 3.8 Flash)
+**Süre:** ~10 dakika
+
+### İstek
+Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerine Akış markasına ve projenin görsel diline uygun özel bir favicon / sekme ikonu yerleştir.
+
+### AI önerisi → Kararım
+- AI rastgele harici bir icon kütüphanesinden genel bir dişli/otomasyon ikonu getirmeyi önerdi → **Reddettim**: Sitede header ve footer'da kullanılan Akış marka simgesi (`#1B2923` koyu çam zemin üzerinde `#CFED69` lime rengi `a` ve `#F5F5EF` kağıt rengi `.` noktası) zaten özgün bir monogram kimliği oluşturuyor; tarayıcı sekmesinde bu marka simgesini kullanmak kimlik bütünlüğü açısından en doğrusudur.
+- AI sadece `.ico` formatı kullanmayı önerdi → **Değiştirdim**: Modern tarayıcılar ve yüksek çözünürlüklü retina ekranlar için ölçeklenebilir SVG tabanlı `icon.svg` ve iOS için `apple-icon.svg` formatını tercih ettim; varsayılan Vercel `favicon.ico` dosyasını kaldırdım.
+
+### Yapılan iş
+- `src/app/icon.svg`: Akış marka renklerini (`#1B2923`, `#CFED69`, `#F5F5EF`) taşıyan vektörel sekme ikonu oluşturuldu.
+- `public/icon.svg`: Statik fallback için aynı ikon public dizinine kopyalandı.
+- `src/app/apple-icon.svg`: Mobil ve Apple cihazlar için 180x180 px uyumlu dokunmatik ikon eklendi.
+- `src/app/layout.tsx`: Root metadata içinde `icons` tanımı (`icon: "/icon.svg"`, `apple: "/apple-icon.svg"`) açıkça belirtildi.
+- `src/app/favicon.ico`: Varsayılan Vercel ikonu çakışmayı önlemek amacıyla kaldırıldı.
+
+### Doğrulama
+- `npm run build` → ✅ Başarılı (`/icon.svg` statik route olarak derlendi).
+- `npm run test` → ✅ 14/14 test başarıyla geçti.

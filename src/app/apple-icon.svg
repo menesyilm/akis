@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <rect width="180" height="180" rx="40" fill="#1B2923" />
+  <text
+    x="80"
+    y="125"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-weight="800"
+    font-size="105"
+    letter-spacing="-8px"
+    fill="#CFED69"
+  >a</text>
+  <circle cx="122" cy="118" r="9.5" fill="#F5F5EF" />
+</svg>
