@@ -48,3 +48,12 @@ export async function listServiceRequests(): Promise<AdminServiceRequest[]> {
     };
   });
 }
+
+export async function deleteServiceRequest(requestId: string): Promise<boolean> {
+  const requestDocument = getAdminFirestore().collection("requests").doc(requestId);
+  const snapshot = await requestDocument.get();
+  if (!snapshot.exists) return false;
+
+  await requestDocument.delete();
+  return true;
+}

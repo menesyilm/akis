@@ -72,6 +72,7 @@ Otomatik testler Zod alan doğrulamalarını ve API'nin 400/201/500 gibi davran�
 - Sunucuda talep kaydı için kullanılan Firebase Admin değerleri (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) da tanımlı olmalı. Gerçek özel anahtarı Git'e veya `.env.example` dosyasına koyma.
 - Giriş, yalnızca `ADMIN_EMAIL` ile eşleşen Firebase hesabına verilir. Sunucu 5 günlük `HttpOnly` oturum çerezi kurar; production'da `Secure`, `SameSite=Lax` kullanılır. Yönetici ekranı her istekte bu oturumu sunucuda doğrular. Oturumsuz kullanıcı `/login`'e, aktif oturumdaki kullanıcı `/login`'den `/admin`'e yönlendirilir. Çıkış oturum çerezini temizler.
 - Admin ekranı en yeni 100 `requests` kaydını kayıt numarası, tarih, ad, e-posta, hizmet, açıklama ve durumuyla gösterir. Veriler istemci Firebase SDK'sıyla değil, doğrulanmış sunucu oturumu ve Admin SDK ile okunur.
+- Her talep kartındaki çöp kutusu, önce X/İptal/Eminim seçenekli onay penceresi açar. Yalnızca açık onaydan sonra aynı kaynaklı `DELETE /api/admin/requests/{requestId}` isteği Firestore belgesini kalıcı siler; geri alma yoktur. Endpoint aktif admin oturumunu doğrular.
 
 ## Güvenlik ve bilinen sınırlar
 

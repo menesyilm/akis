@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
+import DeleteRequestButton from "@/components/delete-request-button";
 import { getVerifiedAdminSession } from "@/lib/server/admin-session";
 import { listServiceRequests } from "@/lib/server/request-repository";
 import { services } from "@/lib/services";
@@ -74,9 +75,12 @@ export default async function AdminPage() {
               <article className="admin-request-card" key={request.id}>
                 <div className="admin-request-topline">
                   <time dateTime={request.createdAt ?? undefined}>{formatDate(request.createdAt)}</time>
-                  <span className={`admin-status${request.status === "new" ? " admin-status-new" : ""}`}>
-                    {request.status === "new" ? "Yeni" : request.status}
-                  </span>
+                  <div className="admin-request-actions">
+                    <span className={`admin-status${request.status === "new" ? " admin-status-new" : ""}`}>
+                      {request.status === "new" ? "Yeni" : request.status}
+                    </span>
+                    <DeleteRequestButton requestId={request.id} />
+                  </div>
                 </div>
                 <div className="admin-request-contact">
                   <h2>{request.name}</h2>

@@ -370,3 +370,30 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - `npm run typecheck` → ✅ Sıfır hata.
 - `npm run build` → ✅ Başarılı (statik ve dinamik rotalar optimize edildi).
 - Yerel `ADMIN_EMAIL` kontrolü → ✅ Yerel dosyada eksik olan anahtar tamamlandı.
+---
+
+## 2026-10-01 14:15–14:31 — Production 500 incelemesi ve admin talep silme
+
+**Araç:** Codex
+**İstek:** Talep gönderimindeki production 500 hatasının kaynağını ayır; `/login` canlı yönlendirme hatasını incele; admin kartlarına kalıcı silme ve onay penceresi ekle.
+
+### Eş zamanlı çalışma kontrolü
+- Başlangıçta Git çalışma ağacı temizdi. Silme özelliği için yalnızca admin sayfası, yeni UI bileşeni, admin API route'u, repository, CSS, README ve AI_LOG dosyalarını değiştirdim.
+- Bu çalışma sırasında başka dosyalarda eş zamanlı değişiklik görünmedi.
+
+### Production tanısı
+- Canlı `GET /login` → ❌ Vercel genel 500 hata ekranı. Giriş yapılmadı ve hiçbir form gönderilmedi.
+- `POST /api/requests` kodu Firebase Admin/Firestore yazma hatasını yakalayıp genel HTTP 500 döndürüyor. Eksik/yanlış `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` veya Firestore servis hesabı yetkisi bu form hatasının başlıca olası nedenleri.
+- Login sayfası başlangıçta bu Admin anahtarlarını kullanmıyor; mevcut kodda `ADMIN_EMAIL` yokluğu oturum yok anlamına geliyor ve login formu gösterilmeli. Bu nedenle aynı environment teşhisi `/login` 500'ünü açıklamıyor. Canlı deployment SHA'sı ve Vercel Runtime Logs erişilebilir olmadığından login 500'ünün kesin nedeni belirlenemedi; Vercel'de deploy edilen SHA ile runtime logu kontrol edilmeli.
+
+### Yapılan iş
+- `src/app/api/admin/requests/[requestId]/route.ts`: Same-origin doğrulaması, Node runtime ve aktif yönetici oturumu gerektiren kalıcı silme endpoint'i eklendi.
+- `src/lib/server/request-repository.ts`: Firestore belgesini önce bulup sonra silen sunucu fonksiyonu eklendi.
+- `src/components/delete-request-button.tsx`, `src/app/admin/page.tsx`, `src/app/globals.css`: Kartın sağ üstünde çöp ikonu; kayıt kimliği gösteren, ortalanmış ve X/İptal/Eminim seçenekli palet uyumlu onay penceresi eklendi. Başarılı silmeden sonra liste yenileniyor.
+- `README.md`: Endpoint ve geri alınamaz silme davranışı belgelendi.
+
+### Doğrulama
+- `npm run lint` → ✅ Başarılı.
+- `npm run build` → ✅ Başarılı; `/api/admin/requests/[requestId]` route'u dahil edildi.
+- `git diff --check` → ✅ Başarılı.
+- Gerçek Firestore kaydı silinmedi; gerçek admin oturumuyla UI akışı çalıştırılmadı.
