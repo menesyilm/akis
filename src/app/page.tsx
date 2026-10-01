@@ -3,6 +3,7 @@ import Reveal from "@/components/reveal";
 import HeroCards from "@/components/hero-cards";
 import ServiceGrid from "@/components/service-grid";
 import StepsList from "@/components/steps-list";
+import RequestForm from "@/components/request-form";
 
 const services = [
   {
@@ -150,8 +151,7 @@ export default function Home() {
           <div className="contact-panel">
             <span className="panel-index">AKIŞ / 01</span>
             <span className="panel-symbol" aria-hidden="true">↗</span>
-            <p>Talep formu hazırlanıyor.</p>
-            <span className="panel-caption">Formu bir sonraki adımda güvenli kayıt akışına bağlayacağız.</span>
+            <RequestForm />
           </div>
         </Reveal>
       </section>
