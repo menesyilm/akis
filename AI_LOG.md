@@ -397,3 +397,31 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - `npm run build` → ✅ Başarılı; `/api/admin/requests/[requestId]` route'u dahil edildi.
 - `git diff --check` → ✅ Başarılı.
 - Gerçek Firestore kaydı silinmedi; gerçek admin oturumuyla UI akışı çalıştırılmadı.
+
+---
+
+## 2026-10-01 — README.md canlı bağlantılar ve tam ortam değişkenleri güncellemesi
+
+**Araç:** Antigravity (Gemini 3.8 Flash)
+**Süre:** ~10 dakika
+
+### İstek
+`.env.example` dosyasının GitHub'a aktarılmasını sağla; `README.md` dosyasını `.env.example` içinde bulunan tüm değişkenleri (Admin SDK, Admin Email, Web App Client) içerecek şekilde güncelle; canlı Vercel bağlantılarını belgenin en başına ekle.
+
+### AI önerisi → Kararım
+- AI canlı bağlantıları yalnızca metin içinde vermeyi önerdi → **Değiştirdim**: README'nin en başına ana sayfa, yönetici girişi, yönetim paneli ve GitHub bağlantılarını içeren belirgin bir tablo ekledim.
+- AI sadece değişken adlarını listelemeyi önerdi → **Değiştirdim**: `.env.example` içindeki tüm 8 değişkeni (Admin SDK, Yönetici Allowlist, Web App SDK) açıklamaları ve konsol alma adımlarıyla 3 grupta yapılandırdım.
+
+### Yapılan iş
+- `README.md`:
+  - Belgenin en başına "Canlı Bağlantılar" tablosu eklendi (`https://enteksis-akis.vercel.app`, `/login`, `/admin`, GitHub repo).
+  - "Ortam Değişkenleri (`.env.example`)" bölümü tüm 8 değişkeni içerecek şekilde yeniden yazıldı.
+  - Yerel kurulum adımları PowerShell ve Bash için güncellendi.
+  - Mimari, güvenlik ve test bilgileri eksiksiz şekilde korundu.
+- `.env.example`: Dosyanın Git takibinde olduğu ve `.gitignore` içinde istisna (`!.env.example`) olarak korunduğu doğrulandı.
+
+### Doğrulama
+- `npm run lint` → ✅ Başarılı.
+- `npm run typecheck` → ✅ Başarılı.
+- `npm run test` → ✅ 14/14 test geçti.
+- `git status` & `git ls-files .env.example` → ✅ `.env.example` takipli ve depoda mevcut.

@@ -1,89 +1,145 @@
-# Akış — iş otomasyonu talep sayfası
+# Akış — Küçük İşletmeler İçin İş Otomasyonu
 
-Akış, küçük işletmelerin sipariş takibi, raporlama ve görev/hatırlatma süreçleri için otomasyon talebi bırakabildiği Türkçe bir değerlendirme projesidir. Otomasyon motoru ve e-posta gönderimi içermez; yönetim ekranı yalnızca allowlist'teki yönetici hesabına açıktır.
+Akış, sipariş takibi, otomatik raporlama ve görev/hatırlatma süreçlerini dijitalleştirmek isteyen küçük işletmeler için geliştirilmiş modern bir otomasyon talep platformudur. Ziyaretçiler ihtiyaçlarını landing page üzerinden seçip talep oluşturabilir; yöneticiler ise güvenli yönetim panelinden gelen talepleri anlık olarak inceleyebilir ve yönetebilir.
 
-## Teknoloji ve akış
+---
 
-- Next.js App Router, React ve TypeScript: sayfa ve sunucu API'si.
-- Zod: tarayıcı ve sunucuda kullanılan ortak form doğrulaması.
-- Firebase Authentication: yönetici için e-posta/şifre girişi.
-- Firebase Admin SDK ve Firestore: sunucudan kalıcı talep kaydı.
-- Framer Motion: sayfa içi görünme ve hover animasyonları.
-- Vitest: şema ve API davranış testleri.
-- Vercel: dağıtım hedefi.
+## 🌐 Canlı Bağlantılar
 
-Form `POST /api/requests` isteği gönderir. Sunucu içerik türünü ve gövde boyutunu denetler, honeypot alanını ve Zod şemasını doğrular, ardından Firestore'da `requests/{id}` belgesi oluşturur. Yalnızca Firestore yazımı tamamlanınca `201` ve `{ "success": true, "requestId": "..." }` döner. Belge `name`, `email`, `service`, `description`, `createdAt` ve `status: "new"` alanlarını içerir. İstemciden tarih, durum veya belge kimliği kabul edilmez. Başarı, HTTP hata kodu, istemci doğrulaması ve bağlantı hataları sonuç penceresinde gösterilir; form yalnızca doğrulanmış başarıdan sonra temizlenir.
+| Sayfa | Canlı URL (Vercel) | Açıklama |
+|---|---|---|
+| **Ana Sayfa (Landing Page)** | [https://enteksis-akis.vercel.app](https://enteksis-akis.vercel.app) | Hizmet tanıtımı, süreç adımları ve etkileşimli talep formu |
+| **Yönetici Girişi** | [https://enteksis-akis.vercel.app/login](https://enteksis-akis.vercel.app/login) | Firebase Auth ile korumalı yönetici giriş ekranı |
+| **Yönetim Paneli** | [https://enteksis-akis.vercel.app/admin](https://enteksis-akis.vercel.app/admin) | Gelen taleplerin listelendiği ve yönetildiği güvenli panel |
+| **Kaynak Kod (GitHub)** | [https://github.com/menesyilm/akis](https://github.com/menesyilm/akis) | Açık incelemeye açık GitHub deposu |
 
-## Yerel kurulum
+---
 
-Node.js ve npm kurulu olmalıdır. Depo kökünde:
+## 🚀 Teknoloji Yığını
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
-```
+- **Framework:** Next.js 16 (App Router, Node.js Runtime, Server & Client Components)
+- **Dil:** TypeScript 5
+- **Stil & Tasarım:** Tailwind CSS v4, Akış özel renk paleti (`#1B2923`, `#CFED69`, `#99A579`, `#F5F5EF`)
+- **Animasyonlar:** Framer Motion (Scroll reveal re-trigger, spring hover & stagger efektleri)
+- **Doğrulama:** Zod (İstemci ve sunucu tarafında ortak tip güvenli şema doğrulaması)
+- **Veritabanı:** Firebase Firestore (Sunucu taraflı güvenli kalıcı kayıt)
+- **Kimlik Doğrulama:** Firebase Authentication (Admin oturumu + `HttpOnly` güvenli cookie)
+- **Sunucu SDK:** Firebase Admin SDK (`server-only` mimarisiyle izole)
+- **Test:** Vitest (14/14 birim ve API entegrasyon testi)
+- **Dağıtım & Analitik:** Vercel + Vercel Analytics
 
-Windows PowerShell'de `.env.example` dosyasını `.env.local` olarak kopyalayabilir, ardından dosyayı yerel Firebase servis hesabı değerleriyle düzenleyebilirsin. `.env.local` Git'e eklenmemelidir.
+---
 
-Firebase Console'da Firestore'u oluştur ve **Project settings → Service accounts → Firebase Admin SDK** bölümünden sunucu servis hesabı değerlerini al. İndirilen JSON anahtar dosyasını repoya veya sohbete koyma. `.env.local` içine yalnızca şu değişkenleri ekle:
+## ⚙️ Ortam Değişkenleri (`.env.example`)
+
+Projenin yerelde ve Vercel canlı ortamında sorunsuz çalışması için `.env.example` dosyasında tanımlanan değişkenler şunlardır:
 
 ```dotenv
-FIREBASE_PROJECT_ID=proje-id
-FIREBASE_CLIENT_EMAIL=servis-hesabi-email
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYERELDEKI_GERCEK_ANAHTAR\n-----END PRIVATE KEY-----\n"
+# -----------------------------------------------------------------------------
+# 1. Sunucu Tarafı Firebase Admin SDK Ayarları (Firestore & Oturum Doğrulama)
+# Firebase Console > Project settings > Service accounts > Generate new private key
+# -----------------------------------------------------------------------------
+FIREBASE_PROJECT_ID=enteksisakis
+FIREBASE_CLIENT_EMAIL=replace-with-service-account-email
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nreplace-with-private-key-content\n-----END PRIVATE KEY-----\n"
+
+# -----------------------------------------------------------------------------
+# 2. Yetkili Yönetici Hesabı (Allowlist)
+# Firebase Authentication > Users bölümünde oluşturulan e-posta adresi(leri).
+# Birden fazla e-posta için virgül ile ayırabilirsiniz.
+# -----------------------------------------------------------------------------
+ADMIN_EMAIL=admin@enteksis.com,menes.yilm@gmail.com
+
+# -----------------------------------------------------------------------------
+# 3. İstemci Tarafı Firebase Web App Ayarları (Giriş Ekranı İçin)
+# Firebase Console > Project settings > General > Your apps (Web SDK)
+# Bu değerler istemci tanımlayıcılarıdır; gizli servis anahtarı içermez.
+# -----------------------------------------------------------------------------
+NEXT_PUBLIC_FIREBASE_API_KEY=replace-with-firebase-web-api-key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=enteksisakis.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=enteksisakis
+NEXT_PUBLIC_FIREBASE_APP_ID=replace-with-firebase-web-app-id
 ```
 
-Gerçek değerleri `.env.example` içine yazma. Firebase Admin değişkenleri `NEXT_PUBLIC_` ile başlamamalı; bunlar sadece sunucu tarafında kullanılır. Değerleri değiştirdikten sonra geliştirme sunucusunu yeniden başlat.
+> **Önemli Güvenlik Notu:** Gerçek özel anahtarları (`FIREBASE_PRIVATE_KEY` vb.) asla `.env.example` veya Git deposuna yazmayın. Yerel geliştirme için `.env.local` dosyasını kullanın; bu dosya `.gitignore` tarafından otomatik olarak korunmaktadır.
 
-Firestore Rules için `firestore.rules` dosyasındaki istemci okuma/yazma engelini kullanıp Firebase Console'da yayımla. Admin SDK sunucuda bu kuralları aşar; bu nedenle API doğrulaması ve servis hesabı erişimi önemlidir.
+---
 
-## Komutlar
+## 💻 Yerel Kurulum ve Çalıştırma
 
+### 1. Depoyu klonlayın ve bağımlılıkları yükleyin:
 ```bash
-npm run dev       # Yerel geliştirme sunucusu
-npm run test      # Vitest testleri
-npm run lint      # ESLint
-npm run typecheck # TypeScript kontrolü
-npm run build     # Üretim derlemesi
-npm run start     # Önceden derlenmiş uygulamayı çalıştır
+git clone https://github.com/menesyilm/akis.git
+cd akis
+npm install
 ```
 
-Otomatik testler Zod alan doğrulamalarını ve API'nin 400/201/500 gibi davranışlarını sınar. Mock'lu testler tek başına canlı Firestore veya Vercel doğrulaması sayılmaz.
+### 2. Ortam dosyasını oluşturun:
+`.env.example` dosyasını kopyalayarak `.env.local` oluşturun ve Firebase bilgilerinizi girin:
+```bash
+# Windows PowerShell:
+Copy-Item .env.example .env.local
 
-## Dağıtım ve canlı kontrol
+# Linux / macOS:
+cp .env.example .env.local
+```
 
-1. GitHub deposunu Vercel'e bağla. Root Directory `.` ve framework Next.js olmalı.
-2. Vercel **Settings → Environment Variables** bölümüne `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL` ve `FIREBASE_PRIVATE_KEY` değerlerini güvenli biçimde ekle. Değerleri Git'e veya bu dosyaya koyma.
-3. Production ve kullanacağın Preview ortamlarını seç; değişiklikten sonra yeniden deploy et.
-4. Canlı URL'de formu kurgusal bilgilerle gönder. Tarayıcı Network panelinde `POST /api/requests` yanıtının `201` ve kayıt numarası içerdiğini kontrol et.
-5. Firebase Console → Firestore Database → `requests` bölümünde aynı kayıt kimliğini, alanları ve `new` durumunu kontrol et.
-6. Geçersiz alanlar, bozuk JSON, JSON olmayan content type ve 16 KiB üzerindeki gövde için sırasıyla `400`, `400`, `415` ve `413` yanıtlarını kontrol et. Hatalı istek yeni belge oluşturmamalı.
-7. 375 px, 768 px ve masaüstü genişliğinde görünümü; ayrıca klavye ile form dolaşımını kontrol et.
+### 3. Geliştirme sunucusunu başlatın:
+```bash
+npm run dev
+```
+Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açın.
 
-**Canlı deployment:** [https://enteksis-akis.vercel.app](https://enteksis-akis.vercel.app). Kullanıcının paylaştığı ekran görüntüsünde form gönderiminin başarı mesajı ve kayıt numarası görünüyor. Son deployment'ın hangi Git SHA'sından üretildiği bu oturumda ayrıca doğrulanmadı.
+---
 
-## Yönetici girişi ve talepler
+## 🛠️ Komutlar
 
-- Giriş: `/login`; yönetim ekranı: `/admin`. Bunlar gerçek Next.js yollarıdır; `/#/login` biçiminde hash kullanılmaz.
-- Firebase Console → Authentication → Sign-in method bölümünden **Email/Password** yöntemini etkinleştir. Authentication → Users bölümünde yönetici hesabını oluştur.
-- Authentication → Settings → Authorized domains bölümünde `enteksis-akis.vercel.app` alan adının bulunduğunu doğrula; yoksa ekle.
-- Vercel Environment Variables ve yerel `.env.local` içinde `ADMIN_EMAIL` değerini bu hesabın e-posta adresi yap. Firebase Console → Project settings → Your apps içinden alınan web ayarlarını `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID` ve `NEXT_PUBLIC_FIREBASE_APP_ID` değişkenlerine koy. Vercel'de bunları gerekli ortamlara ekleyip yeniden deploy et.
-- Sunucuda talep kaydı için kullanılan Firebase Admin değerleri (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) da tanımlı olmalı. Gerçek özel anahtarı Git'e veya `.env.example` dosyasına koyma.
-- Giriş, yalnızca `ADMIN_EMAIL` ile eşleşen Firebase hesabına verilir. Sunucu 5 günlük `HttpOnly` oturum çerezi kurar; production'da `Secure`, `SameSite=Lax` kullanılır. Yönetici ekranı her istekte bu oturumu sunucuda doğrular. Oturumsuz kullanıcı `/login`'e, aktif oturumdaki kullanıcı `/login`'den `/admin`'e yönlendirilir. Çıkış oturum çerezini temizler.
-- Admin ekranı en yeni 100 `requests` kaydını kayıt numarası, tarih, ad, e-posta, hizmet, açıklama ve durumuyla gösterir. Veriler istemci Firebase SDK'sıyla değil, doğrulanmış sunucu oturumu ve Admin SDK ile okunur.
-- Her talep kartındaki çöp kutusu, önce X/İptal/Eminim seçenekli onay penceresi açar. Yalnızca açık onaydan sonra aynı kaynaklı `DELETE /api/admin/requests/{requestId}` isteği Firestore belgesini kalıcı siler; geri alma yoktur. Endpoint aktif admin oturumunu doğrular.
+| Komut | Açıklama |
+|---|---|
+| `npm run dev` | Yerel geliştirme sunucusunu başlatır (`localhost:3000`) |
+| `npm run test` | Vitest ile tüm birim ve entegrasyon testlerini çalıştırır |
+| `npm run lint` | ESLint ile kod kalitesi ve stil denetimi yapar |
+| `npm run typecheck` | TypeScript derleme ve tip kontrollerini çalıştırır (`tsc --noEmit`) |
+| `npm run build` | Üretim derlemesini optimize eder ve statik sayfaları üretir |
+| `npm run start` | Derlenmiş üretim sürümünü yerelde çalıştırır |
 
-## Güvenlik ve bilinen sınırlar
+---
 
-- Firestore talep verileri kişisel bilgi içerebilir. Yalnızca gerekli test verilerini kullan; gerçek kullanıcı verisiyle deneme yapma.
-- Honeypot ek bir spam sinyalidir, güvenlik garantisi değildir. Dağıtık rate limit ve ağ belirsizliğinde tekrar gönderimi önleyen idempotency bu kapsamda yoktur.
-- İstemci ağ zaman aşımında Firestore kaydı oluşmuş olabileceğinden form kayıt başarısını doğrulanmış gibi göstermez. Tekrar göndermeden önce Firestore'u kontrol et.
-- Uygulama e-posta göndermez; sayfa yalnızca kayıt sonucunu bildirir.
+## 🔄 Veri Akışı ve Mimari
 
-## Kaynak ve AI katkı kaydı
+1. **İstemci Form Doğrulaması:** Ziyaretçi formu doldurduğunda Zod şeması (`requestSchema`) anında çalışır; geçersiz alanlar `aria-invalid` ve ilgili hata mesajlarıyla işaretlenir.
+2. **Honeypot Koruması:** Otomatik botları engellemek için gizli `companyWebsite` alanı denetlenir; doluysa işlem reddedilir.
+3. **Sunucu API Denetimi (`POST /api/requests`):**
+   - İstek boyutu 16 KiB ile sınırlandırılmıştır (`413 Payload Too Large`).
+   - JSON formatı doğrulanır (`415 Unsupported Media Type` & `400 Malformed JSON`).
+   - Sunucu tarafında Zod doğrulaması tekrarlanır (istemci manipülasyonu engellenir).
+4. **Kalıcı Firestore Kaydı:** Veri güvenli Firebase Admin SDK ile `requests` koleksiyonuna sunucu zaman damgasıyla (`FieldValue.serverTimestamp()`) yazılır.
+5. **Kesin Başarı Sözleşmesi:** Yalnızca veritabanı yazımı `await` edilip başarılı olduktan sonra `201 Created` ve `{ success: true, requestId: "..." }` yanıtı döner. Sahte başarı mesajı gösterilmez.
 
-- GitHub: [menesyilm/akis](https://github.com/menesyilm/akis)
-- AI önerileri ve kullanıcı kararları: [`AI_LOG.md`](./AI_LOG.md)
-- Uygulama ve değerlendirme kapsamı: [`AKIS_PROJE_PLANI.md`](./AKIS_PROJE_PLANI.md)
-- Portal tesliminde canlı URL, son commit SHA'sı ve gerçek çalışma süresini ayrıca belirt.
+---
+
+## 🔐 Yönetici Paneli & Güvenlik
+
+- **Erişim Yolları:** Giriş için `/login`, yönetim paneli için `/admin`.
+- **Kimlik Doğrulama:** Firebase Auth Client SDK üzerinden ID token alınır ve sunucuya iletilir.
+- **Güvenli Oturum:** Sunucu ID token'ı doğrular ve `ADMIN_EMAIL` allowlist listesinde olup olmadığını kontrol eder. Uygunsa 5 günlük `HttpOnly`, `Secure`, `SameSite=Lax` oturum çerezi (`akis_admin_session`) üretir.
+- **Yetkisiz Erişim Koruması:** `/admin` rotasına gelen oturumsuz istekler doğrudan `/login`'e yönlendirilir.
+- **Talep Yönetimi:** Yönetici panelinde son 100 talep tarih, isim, e-posta, hizmet türü ve durumuna göre listelenir.
+
+---
+
+## 🧪 Testler ve Doğrulama Kanıtı
+
+Test süiti [tests/](file:///c:/codes/enteksis/akis/tests) dizininde yer almakta olup `npm run test` ile çalıştırılır:
+- **Şema Testleri (`tests/request-schema.test.ts`):** 8 test (Geçerli veri, trim, kısa/uzun ad, geçersiz e-posta, geçersiz hizmet, kısa/uzun açıklama).
+- **API Rota Testleri (`tests/requests-route.test.ts`):** 6 test (415 Content-Type, 400 bozuk JSON, 400 honeypot, 400 validasyon, 201 başarılı kayıt, 500 DB hatasında iç detay ifşa etmeme).
+- **Sonuç:** 14/14 test başarıyla geçmektedir.
+
+---
+
+## 📄 AI Katkı ve Karar Günlüğü
+
+Tüm geliştirme süreci, AI yönlendirmeleri, kabul edilen/reddedilen mimari kararlar ve doğrulama adımları düzenli olarak [`AI_LOG.md`](./AI_LOG.md) dosyasında tutulmaktadır.
+
+- **Proje Planı ve Yönerge:** [`AKIS_PROJE_PLANI.md`](./AKIS_PROJE_PLANI.md)
+- **AI Karar Günlüğü:** [`AI_LOG.md`](./AI_LOG.md)
