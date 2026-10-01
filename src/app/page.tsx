@@ -1,28 +1,6 @@
 import SiteNav from "@/components/site-nav";
-
-const services = [
-  {
-    number: "01",
-    title: "Sipariş takibi",
-    description:
-      "Farklı kanallardan gelen siparişleri tek bir akışta toplayın. Ekibiniz, her işin hangi aşamada olduğunu kolayca görsün.",
-    icon: "↗",
-  },
-  {
-    number: "02",
-    title: "Raporlama",
-    description:
-      "Tekrarlanan rapor hazırlığını otomatikleştirin. İhtiyacınız olan bilgiler, doğru zamanda ve düzenli biçimde elinizde olsun.",
-    icon: "▤",
-  },
-  {
-    number: "03",
-    title: "Görev ve hatırlatma",
-    description:
-      "İşleri doğru kişiye, doğru zamanda ulaştırın. Takip gerektiren adımlar gözden kaçmasın.",
-    icon: "◷",
-  },
-];
+import RequestForm from "@/components/request-form";
+import { services } from "@/lib/services";
 
 const steps = [
   {
@@ -125,10 +103,10 @@ export default function Home() {
         </div>
 
         <div className="service-grid">
-          {services.map((service) => (
-            <article className="service-card" key={service.number}>
+          {services.map((service, index) => (
+            <article className="service-card" key={service.id}>
               <div className="service-card-top">
-                <span className="service-number">{service.number}</span>
+                <span className="service-number">0{index + 1}</span>
                 <span className="service-icon" aria-hidden="true">{service.icon}</span>
               </div>
               <h3>{service.title}</h3>
@@ -167,12 +145,7 @@ export default function Home() {
           <h2 id="contact-title">İşinizi kolaylaştıracak<br /><em>bir yerden başlayalım.</em></h2>
           <p>İhtiyacınızı anlatın; size uygun olabilecek adımları birlikte değerlendirelim.</p>
         </div>
-        <div className="contact-panel">
-          <span className="panel-index">AKIŞ / 01</span>
-          <span className="panel-symbol" aria-hidden="true">↗</span>
-          <p>Talep formu hazırlanıyor.</p>
-          <span className="panel-caption">Formu bir sonraki adımda güvenli kayıt akışına bağlayacağız.</span>
-        </div>
+        <RequestForm />
       </section>
 
       <footer className="site-footer">

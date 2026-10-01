@@ -120,3 +120,24 @@ Mobil sidebar'da 03 "Birlikte konuşalım" butonunun koyu arka planı yarıda ke
 ### Doğrulama
 - `npm run build` → ✅ Başarılı
 - Görsel kontrol → ⏳ Kullanıcı doğrulayacak
+
+---
+
+## 2026-10-01 — Talep formu ve Firestore API
+
+**İstek:** Talep formunu ortak Zod doğrulaması, sunucu API'si ve Firestore kaydıyla tamamla.
+
+### Yapılan iş
+- `src/lib/services.ts`: Hizmet kimlikleri ve Türkçe başlıkları hem landing page hem formda kullanılacak şekilde ortaklaştırıldı.
+- `src/lib/request-schema.ts`: İsim, e-posta, hizmet ve açıklama için trim/uzunluk/format doğrulaması eklendi.
+- `src/app/api/requests/route.ts`: JSON content type, 16 KiB gövde sınırı, bozuk JSON, honeypot, Zod doğrulaması ve genel hata yanıtları eklendi. Firestore yazması tamamlanmadan `201` dönmüyor.
+- `src/lib/server/request-repository.ts`: `requests/{id}` belgesini sunucu zaman damgası ve `new` durumuyla oluşturan repository eklendi.
+- `src/components/request-form.tsx`: Alan hataları, ilk hatalı alana focus, gönderiliyor/başarı/hata durumları ve doğrulanmış kayıt numarası eklendi.
+- `.env.local` içindeki Firebase Admin değişken adları bulundu; değerler açılmadı veya raporlanmadı.
+
+### Doğrulama
+- `npm run build` → ✅ Başarılı.
+- `npm run lint` → ✅ Başarılı.
+- Yerel API'de geçersiz payload → HTTP 400.
+- Geçerli test talebinin Firestore yazma yanıtı yakalanamadı; doğrudan Firestore geri okuma denemesi de tamamlanmadı. Başarılı yazma doğrulanmış değil; zaman aşımından önce kayıt oluşmuş olabileceği için tekrar göndermeden önce Firestore Console kontrol edilmeli.
+- Vitest testleri henüz eklenmedi/çalıştırılmadı; planın sonraki test aşamasında ele alınacak.
