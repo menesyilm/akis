@@ -287,6 +287,14 @@ export default function RequestForm() {
       >
         {resultNotice && (
           <div className="result-dialog-content">
+            <button
+              aria-label="Sonuç penceresini kapat"
+              className="result-dialog-close"
+              onClick={closeResultNotice}
+              type="button"
+            >
+              ×
+            </button>
             <span aria-hidden="true" className="result-dialog-mark">
               {resultNotice.success ? "✓" : "!"}
             </span>

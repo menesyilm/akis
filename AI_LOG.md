@@ -273,8 +273,6 @@ Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerin
 - Kullanıcının 2026-10-01 tarihinde paylaştığı ekran görüntüsünde canlı sayfa adresi ve formun başarı mesajı görünür.
 - Deployment SHA eşleşmesi ayrıca doğrulanmadı.
 
----
-
 ## 2026-10-01 13:20–13:29 — Talep sonucu penceresi ve başarılı gönderim sonrası form temizliği
 
 **Araç:** Codex
@@ -297,3 +295,31 @@ Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerin
 - `git diff --check` → ✅ Başarılı.
 - Yerel tarayıcıda boş form gönderimi → ✅ Doğrulama penceresinde `HTTP 400` ve neden gösterildi; Tamam sonrası ilk hatalı Adınız alanına odak döndü.
 - Gerçek Firestore'a yeni başarılı deneme kaydı gönderilmedi; başarı akışı API yanıtına göre kod üzerinden doğrulandı.
+
+---
+
+## 2026-10-01 13:30–13:53 — Merkez popup, yönetici oturumu ve talep paneli
+
+**Araç:** Codex
+**İstek:** Sonuç penceresini ekran ortasında gösterip X kapatma düğmesi ekle; `/login` ve korumalı `/admin` yollarını, Firebase Authentication girişini ve Firestore taleplerini gösteren yönetim ekranını oluştur.
+
+### Karar
+- Yönetici yetkisini yalnızca Firebase'de oturum açmış olmaya bırakmadım. `ADMIN_EMAIL` sunucu allowlist'i ile yalnızca tanımlı hesaba erişim veriliyor.
+- Tarayıcıda kalıcı Firebase Auth oturumu tutmak yerine ID token'ı aynı kaynaklı route'a gönderip 5 günlük `HttpOnly` sunucu oturum çerezine dönüştürüyorum. Oturum başarılı kurulunca istemci Firebase Auth durumunu temizliyor.
+- Gerçek e-posta/şifre veya Vercel hesap ayarları bende olmadığı için kullanıcı hesabı oluşturmadım ve deployment ortam değişkenlerine dokunmadım.
+
+### Yapılan iş
+- `src/components/request-form.tsx`, `src/app/globals.css`: Sonuç popup'ı viewport merkezine sabitlendi ve sağ üst X eklendi.
+- `src/app/login/page.tsx`, `src/components/login-form.tsx`: Email/password giriş arayüzü ve Firebase Auth istemci akışı oluşturuldu.
+- `src/app/api/auth/session/route.ts`, `src/app/api/auth/logout/route.ts`, `src/lib/server/admin-session.ts`: Aynı kaynak doğrulaması, yeni giriş kontrolü, allowlist doğrulaması, HttpOnly oturum çerezi, çıkışta çerezi temizleme ve sunucu tarafı oturum doğrulaması eklendi.
+- `src/app/admin/page.tsx`: Oturumsuz istekleri `/login`'e yönlendiren, son 100 talebin tarih, ad, e-posta, hizmet, açıklama, durum ve ID alanlarını gösteren responsive panel eklendi.
+- `src/lib/server/firebase-admin.ts`, `src/lib/server/request-repository.ts`: Admin Auth erişimi ve Firestore taleplerini sıralı, sınırlı okumak için sunucu yardımcıları eklendi.
+- `src/lib/firebase-client.ts`, `.env.example`, `README.md`: Firebase Web App değişkenleri ve Firebase Authentication kurulum adımları belgelendi. Daha önce kullanıcı tarafından paylaşılan web yapılandırması `.env.local` dosyasına yerel olarak eklendi; dosya Git dışındadır ve değerler loglanmadı.
+
+### Doğrulama
+- `npm run build` → ✅ Başarılı; `/login`, `/admin` ve oturum API route'ları derlendi.
+- `npm run lint` → ✅ Başarılı.
+- `git diff --check` → ✅ Başarılı.
+- Yerel anonim HTTP isteği `GET /admin` → ✅ `307 /login`; `GET /login` → ✅ `200`.
+- Yerel tarayıcıda login ekranı ve popup görsel olarak incelendi. Boş form gönderiminde popup ekran ortasında; X ve Tamam düğmeleri erişilebilir durumda.
+- Yönetici hesabı, Firebase Console Email/Password ayarı ve `ADMIN_EMAIL` henüz yapılandırılmadığı için başarılı giriş, authenticated redirect ve canlı Firestore listesi uçtan uca doğrulanmadı.

@@ -1,11 +1,12 @@
 # Akış — iş otomasyonu talep sayfası
 
-Akış, küçük işletmelerin sipariş takibi, raporlama ve görev/hatırlatma süreçleri için otomasyon talebi bırakabildiği Türkçe bir değerlendirme projesidir. Bu proje otomasyon motoru, kullanıcı girişi veya e-posta gönderimi içermez.
+Akış, küçük işletmelerin sipariş takibi, raporlama ve görev/hatırlatma süreçleri için otomasyon talebi bırakabildiği Türkçe bir değerlendirme projesidir. Otomasyon motoru ve e-posta gönderimi içermez; yönetim ekranı yalnızca allowlist'teki yönetici hesabına açıktır.
 
 ## Teknoloji ve akış
 
 - Next.js App Router, React ve TypeScript: sayfa ve sunucu API'si.
 - Zod: tarayıcı ve sunucuda kullanılan ortak form doğrulaması.
+- Firebase Authentication: yönetici için e-posta/şifre girişi.
 - Firebase Admin SDK ve Firestore: sunucudan kalıcı talep kaydı.
 - Framer Motion: sayfa içi görünme ve hover animasyonları.
 - Vitest: şema ve API davranış testleri.
@@ -61,6 +62,16 @@ Otomatik testler Zod alan doğrulamalarını ve API'nin 400/201/500 gibi davran�
 7. 375 px, 768 px ve masaüstü genişliğinde görünümü; ayrıca klavye ile form dolaşımını kontrol et.
 
 **Canlı deployment:** [https://enteksis-akis.vercel.app](https://enteksis-akis.vercel.app). Kullanıcının paylaştığı ekran görüntüsünde form gönderiminin başarı mesajı ve kayıt numarası görünüyor. Son deployment'ın hangi Git SHA'sından üretildiği bu oturumda ayrıca doğrulanmadı.
+
+## Yönetici girişi ve talepler
+
+- Giriş: `/login`; yönetim ekranı: `/admin`. Bunlar gerçek Next.js yollarıdır; `/#/login` biçiminde hash kullanılmaz.
+- Firebase Console → Authentication → Sign-in method bölümünden **Email/Password** yöntemini etkinleştir. Authentication → Users bölümünde yönetici hesabını oluştur.
+- Authentication → Settings → Authorized domains bölümünde `enteksis-akis.vercel.app` alan adının bulunduğunu doğrula; yoksa ekle.
+- Vercel Environment Variables ve yerel `.env.local` içinde `ADMIN_EMAIL` değerini bu hesabın e-posta adresi yap. Firebase Console → Project settings → Your apps içinden alınan web ayarlarını `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID` ve `NEXT_PUBLIC_FIREBASE_APP_ID` değişkenlerine koy. Vercel'de bunları gerekli ortamlara ekleyip yeniden deploy et.
+- Sunucuda talep kaydı için kullanılan Firebase Admin değerleri (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY`) da tanımlı olmalı. Gerçek özel anahtarı Git'e veya `.env.example` dosyasına koyma.
+- Giriş, yalnızca `ADMIN_EMAIL` ile eşleşen Firebase hesabına verilir. Sunucu 5 günlük `HttpOnly` oturum çerezi kurar; production'da `Secure`, `SameSite=Lax` kullanılır. Yönetici ekranı her istekte bu oturumu sunucuda doğrular. Oturumsuz kullanıcı `/login`'e, aktif oturumdaki kullanıcı `/login`'den `/admin`'e yönlendirilir. Çıkış oturum çerezini temizler.
+- Admin ekranı en yeni 100 `requests` kaydını kayıt numarası, tarih, ad, e-posta, hizmet, açıklama ve durumuyla gösterir. Veriler istemci Firebase SDK'sıyla değil, doğrulanmış sunucu oturumu ve Admin SDK ile okunur.
 
 ## Güvenlik ve bilinen sınırlar
 
