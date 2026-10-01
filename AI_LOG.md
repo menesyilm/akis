@@ -560,3 +560,12 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - Üretim derlemesi tarayıcıda kontrol edildi: yenilemede hero opacity 0 ve ötelenmiş durumdan opacity 1 / transform none durumuna geçti; hizmetler aşağı girişte sırayla görünür oldu, talep bölümüne geçince opacity 0'a sıfırlandı, yukarı dönüşte yeniden animasyon başladı ve tamamlandı. Süreç adımları da görünür durumda opacity 1 / transform none ile doğrulandı.
 - Otomatik doğrulama: 36 test geçti; lint, TypeScript ve üretim build başarılı. Bu kontrol için talep kaydı oluşturulmadı.
 
+## 2026-10-01 — Nihai teslim öncesi yeniden tarama
+
+- Kullanıcının isteği: tüm projeyi yeniden denetle ve teslim alanlarını hazırla. Codex kaynak/belge/Git incelemesi, Vitest, ESLint, TypeScript, Next.js build, public GitHub API ve Firestore Admin geri okuması kullandı. Kesin aktif süre tutulmadı.
+- Kaynak sürümü `9c08166921814b90f632f72e4e2c48adefc9ae0f` production health ile eşleşti; GitHub Actions 36868485649 completed/success. Yerelde 36/36 test, lint, typecheck ve production build yeniden geçti.
+- Canlı landing/login, public GitHub ve sürüme bağlı AI_LOG bağlantısı HTTP 200; anonim admin 307; invalid payload 400, content type 415, büyük gövde 413. Mevcut kurgusal API/UI kayıtları yeniden geri okundu, `deneme@example.com` ve zaman damgası doğrulandı; anonim Firestore okuma 403. Yeni kayıt yazılmadı, mevcut kayıt silinmedi.
+- Form/veri akışı, auth/origin/allowlist, stream boyut sınırı, güvenli hata çıktısı, responsive stil ve animasyon bileşenleri yeniden incelendi. Ana görevde yeni çalışmama bulgusu görülmedi. Önceki denetim belgesindeki görünür SSR iddiası scroll düzeltmesinin gerçek davranışına göre düzeltildi; uygulama kodunda yeni değişiklik yapılmadı.
+- Ayrıntılı değerlendirme rehberi URL'si web aracında tekrar erişilemedi; kullanıcı tarafından paylaşılan görev ve puanlama metni esas alındı. Gerçek yönetici hesabıyla oturum/silme ve tam ekran okuyucu/cihaz matrisi tamamlanmış diye sunulmadı. Rate limiting, idempotency ve 100 kayıt sonrasındaki sayfalama belgeli kapsam sınırları olarak kaldı.
+- Teslim metni canlı adres, kaynak kod, nihai commit ve aynı sürüme sabitlenmiş AI_LOG/README bağlantılarını içerecek. Son belge commit'i sonrası production SHA ayrıca kontrol edilir; kendi SHA'sı bu commit'in içine yazılmaz.
+

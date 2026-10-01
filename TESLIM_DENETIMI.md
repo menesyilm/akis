@@ -1,11 +1,19 @@
 # ENTEKSİS teslim denetimi — 2026-10-01
 
+## Nihai yeniden tarama
+
+- Animasyon düzeltmesini içeren `9c08166921814b90f632f72e4e2c48adefc9ae0f` kaynak sürümü yeniden incelendi; production health aynı commit'i gösterdi. [GitHub CI](https://github.com/menesyilm/akis/actions/runs/36868485649) completed/success. 36 test, lint, typecheck ve build tekrar başarılı.
+- Landing/login ve GitHub/AI_LOG bağlantıları açılıyor. Canlı anonim admin 307 ile login'e yönleniyor; geçersiz JSON alanları 400, yanlış içerik türü 415, aşırı büyük gövde 413. Önceden oluşturulmuş iki kurgusal kayıt Firestore'dan tekrar geri okundu; e-posta ve zaman damgası doğrulandı. Anonim Firestore erişimi 403 ile reddediliyor. Bu taramada yeni kayıt oluşturulmadı veya silinmedi.
+- Kaynakta istemci/sunucu doğrulaması, beklenen kalıcı yazma, yalnızca 201 + success + kayıt ID'sinde başarı gösterimi, gönderiliyor/hata durumları, modal/odak davranışları, responsive stiller ve scroll animasyonları gözden geçirildi. Temel görev kapsamında yeni bir çalışmama bulgusu yok.
+- Son commit bu yeniden tarama kaydını ve önceki SSR görünürlük ifadesinin düzeltilmesini içerir; uygulama kodu değişmez. Nihai SHA teslim alanında ayrıca belirtilir.
+- Bilinen kapsam sınırları: dağıtık rate limiting/idempotency ve admin sayfalama yok; yönetici en yeni 100 kaydı görür. Gerçek yönetici şifresiyle giriş/silme ve tam ekran okuyucu/cihaz matrisi bu oturumda sınanmadı. Ayrıntılı değerlendirme rehberi bağlantısı tekrar açılamadı; kontrol kullanıcı tarafından paylaşılan görev metnine göre yapıldı. Eksiksiz aktif emek ve geçmiş proje bilgileri kullanıcı beyanıdır; uydurulmaz.
+
 ## Son iyileştirme durumu
 
 Önceki denetim aşağıda tarihsel bulgu olarak korunur. Bu bölüm son kaynak durumunu belirtir:
 
 - Kontrast: metin rengi `#596544`, açık zeminle 5.69:1; placeholder ek opaklığı kaldırıldı, focus rengi koyulaştırıldı.
-- Reduced motion: dört Motion bileşeninde tercih uygulanır; SSR başlangıcı görünür, JavaScript başarısızlığında içerik gizlenmez.
+- Reduced motion: dört Motion bileşeninde tercih uygulanır; CSS media kuralı ilk render sırasında görünürlüğü korur. Scroll animasyonları gizli başlangıç durumundan çalışır; JavaScript kapalıyken `noscript` stili içeriği görünür tutar. Açılış ve her iki yönde scroll tekrarları tarayıcıda doğrulandı. JavaScript açıkken hydration başarısızlığı için genel bir görünürlük garantisi verilmez.
 - Mobil sidebar: native modal dialog; form gönderiminde aria-busy/live status; teknik HTTP etiketleri ve ziyaretçiye Firestore yönlendirmesi kaldırıldı.
 - Silme sürerken Escape engellenir; hizmet içeriği tek kaynaktan gelir.
 - Güvenli işlem/hata kodu logları; oturum altyapı hatası 503; talep ve session gövdelerine ortak stream sınırı.
