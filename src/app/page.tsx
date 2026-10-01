@@ -149,8 +149,6 @@ export default function Home() {
         </Reveal>
         <Reveal variant="scale" delay={0.15}>
           <div className="contact-panel">
-            <span className="panel-index">AKIŞ / 01</span>
-            <span className="panel-symbol" aria-hidden="true">↗</span>
             <RequestForm />
           </div>
         </Reveal>

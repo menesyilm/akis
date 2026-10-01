@@ -171,3 +171,38 @@ Sayfadaki tüm yazılar ve bölümler scroll ile viewport'a girince animasyonlu 
 - İlk `npm run build` → ❌ TypeScript hatası (`springTransition.type` string literal gerekiyor)
 - `as const` assertion ile düzeltme → `npm run build` → ✅ Başarılı
 - Tarayıcı görsel kontrol → ⏳ Kullanıcı doğrulayacak
+
+---
+
+## 2026-10-01 — Form durumları, E2E testleri ve hata yönetimi düzenlemesi
+
+**Araç:** Antigravity (Gemini 3.8 Flash)
+**Süre:** ~20 dakika
+
+### İstek
+Talep formunun E2E testlerini gerçekleştir; HTTP 200/201, 400, 413, 415, 500 status durumlarını ve hata çıktılarını kontrol edip form hata yönetimini bu durumlara göre düzenle.
+
+### AI önerisi → Kararım
+- AI tüm hata durumlarında tek bir genel catch-all mesaj göstermeyi öneriyordu → **Değiştirdim**: HTTP 400 (doğrulama/honeypot), 413 (boyut aşımı), 415 (JSON format hatası), 500 (sunucu/veritabanı hatası) için sunucudan dönen gerçek hata mesajını ekranda gösterdim; ağ/timeout hatasını ise yalnızca gerçek bağlantı kesintilerinde gösterilecek şekilde ayırdım.
+- AI testleri sadece manuel yapmayı önerdi → **Değiştirdim**: Hem canlı HTTP endpoint üzerinde 9 senaryolu E2E test koşusu yaptım hem de `vitest` ile 14 birim/entegrasyon testi ekledim.
+- AI `package.json` script'lerini olduğu gibi bırakmayı önerdi → **Reddettim**: Plan doğrultusunda `test` ve `typecheck` scriptlerini ekledim.
+
+### Yapılan iş
+- `src/components/request-form.tsx`: Status kodlarına (201, 400, 413, 415, 500) ve sunucudan dönen `error` metnine göre durum mesajı yönetimi eklendi; AbortError (zaman aşımı) ve ağ hatası durumları ayrıştırıldı.
+- `package.json`: `test: "vitest run"` ve `typecheck: "tsc --noEmit"` komutları eklendi.
+- `vitest.config.mjs`: Test ortamı ve `@/*` alias çözünürlüğü yapılandırıldı.
+- `tests/request-schema.test.ts`: Şema doğrulaması için 8 test (geçerli veri, trim, kısa isim, uzun isim, hatalı e-posta, tanımsız hizmet, kısa/uzun açıklama) eklendi.
+- `tests/requests-route.test.ts`: API route davranışı için 6 test (415, 400 bozuk JSON, 400 honeypot, 400 validation, 201 success, 500 DB error güvenli mesaj) eklendi.
+
+### Doğrulama
+- Canlı E2E HTTP Testleri (9 senaryo):
+  - 415 Unsupported Media Type → ✅ Geçti
+  - 413 Payload Too Large (>16KiB) → ✅ Geçti
+  - 400 Malformed JSON Syntax → ✅ Geçti
+  - 400 Honeypot Bot Tespiti → ✅ Geçti
+  - 400 Şema / Validasyon Hataları (kısa ad, hatalı mail, geçersiz servis, kısa açıklama) → ✅ Geçti
+  - 201 Created & Gerçek Firestore Belge ID Üretimi → ✅ Geçti
+- `npm run test` → ✅ 2 test dosyası, 14 testin tamamı başarılı (14/14)
+- `npm run typecheck` → ✅ Sıfır hata
+- `npm run lint` → ✅ Sıfır hata
+- `npm run build` → ✅ Başarılı (statik sayfalar + dynamic route derlendi)

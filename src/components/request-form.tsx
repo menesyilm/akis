@@ -92,28 +92,44 @@ export default function RequestForm() {
         signal: abortController.signal,
       });
 
-      const result: unknown = await response.json();
-      if (
-        response.status !== 201 ||
-        typeof result !== "object" ||
-        result === null ||
-        !("success" in result) ||
-        result.success !== true ||
-        !("requestId" in result) ||
-        typeof result.requestId !== "string" ||
-        result.requestId.length === 0
-      ) {
-        throw new Error("Request could not be confirmed.");
+      let result: Record<string, unknown> | null = null;
+      try {
+        result = (await response.json()) as Record<string, unknown>;
+      } catch {
+        // Response body was not JSON
       }
 
-      setRequestId(result.requestId);
-      setSubmissionState("success");
-      setStatusMessage("Talebiniz kaydedildi.");
-    } catch {
+      if (response.status === 201 && result && result.success === true && typeof result.requestId === "string" && result.requestId.length > 0) {
+        setRequestId(result.requestId);
+        setSubmissionState("success");
+        setStatusMessage("Talebiniz kaydedildi.");
+        return;
+      }
+
+      // Handle specific HTTP error statuses
       setSubmissionState("error");
-      setStatusMessage(
-        "Talebinizin kaydedildiği doğrulanamadı. Ağ hatasında kayıt oluşmuş olabilir; tekrar göndermeden önce kontrol edin.",
-      );
+      const serverErrorMessage = typeof result?.error === "string" ? result.error : null;
+
+      if (response.status === 400) {
+        setStatusMessage(serverErrorMessage ?? "Form alanlarını kontrol edip yeniden deneyin.");
+      } else if (response.status === 413) {
+        setStatusMessage(serverErrorMessage ?? "İstek boyutu izin verilen sınırı aşıyor.");
+      } else if (response.status === 415) {
+        setStatusMessage(serverErrorMessage ?? "İstek JSON biçiminde olmalı.");
+      } else if (response.status === 500) {
+        setStatusMessage(serverErrorMessage ?? "Talebiniz şu anda kaydedilemedi. Lütfen biraz sonra yeniden deneyin.");
+      } else {
+        setStatusMessage(serverErrorMessage ?? `Beklenmeyen bir hata oluştu (Kod: ${response.status}). Lütfen tekrar deneyin.`);
+      }
+    } catch (error) {
+      setSubmissionState("error");
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setStatusMessage("İstek zaman aşımına uğradı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.");
+      } else {
+        setStatusMessage(
+          "Sunucuya ulaşılamadı. Ağ hatasında kayıt oluşmuş olabilir; tekrar göndermeden önce bağlantınızı kontrol edin.",
+        );
+      }
     } finally {
       window.clearTimeout(timeoutId);
     }
