@@ -60,7 +60,7 @@ Otomatik testler Zod alan doğrulamalarını ve API'nin 400/201/500 gibi davran�
 6. Geçersiz alanlar, bozuk JSON, JSON olmayan content type ve 16 KiB üzerindeki gövde için sırasıyla `400`, `400`, `415` ve `413` yanıtlarını kontrol et. Hatalı istek yeni belge oluşturmamalı.
 7. 375 px, 768 px ve masaüstü genişliğinde görünümü; ayrıca klavye ile form dolaşımını kontrol et.
 
-**Canlı deployment URL'si:** Henüz README'ye eklenmedi; canlı adres ve son commit'ten üretildiği doğrulandıktan sonra eklenmeli.
+**Canlı deployment:** [https://enteksis-akis.vercel.app](https://enteksis-akis.vercel.app). Kullanıcının paylaştığı ekran görüntüsünde form gönderiminin başarı mesajı ve kayıt numarası görünüyor. Son deployment'ın hangi Git SHA'sından üretildiği bu oturumda ayrıca doğrulanmadı.
 
 ## Güvenlik ve bilinen sınırlar
 

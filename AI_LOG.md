@@ -253,3 +253,22 @@ Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerin
 ### Doğrulama
 - `npm run build` → ✅ Başarılı (`/icon.svg` statik route olarak derlendi).
 - `npm run test` → ✅ 14/14 test başarıyla geçti.
+
+---
+
+## 2026-10-01 13:19 — Canlı URL ve form başarısı kullanıcı kanıtıyla güncellendi
+
+**Araç:** Codex
+**İstek:** Kullanıcı canlı yayının zaten çalıştığını ekran görüntüsüyle bildirdi ve sonraki adıma geçilmesini istedi.
+
+### Karar
+- Paylaşılan görüntüdeki ad/e-posta ve kayıt numarasını dokümana kopyalamadım; yalnızca genel canlı adresi ve form başarı kanıtını kaydettim.
+- Görüntü canlı formun başarılı olduğunu gösteriyor; hangi Git SHA'sının Vercel'e deploy edildiğini tek başına kanıtlamıyor. Bu ayrımı README'de belirttim.
+
+### Yapılan iş
+- `README.md`: Canlı URL `https://enteksis-akis.vercel.app` olarak eklendi. Kullanıcının ilettiği başarılı form gönderimi not edildi.
+- Depoda ayrıca mevcut Akış renklerinde SVG favicon, Apple touch icon ve marka ikonu entegrasyonu (`58e64ba`) bulunduğu kontrol edildi; bu dosyalara dokunulmadı.
+
+### Doğrulama
+- Kullanıcının 2026-10-01 tarihinde paylaştığı ekran görüntüsünde canlı sayfa adresi ve formun başarı mesajı görünür.
+- Deployment SHA eşleşmesi ayrıca doğrulanmadı.
