@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { inMemoryPersistence, setPersistence, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 import { getFirebaseAuth } from "@/lib/firebase-client";
@@ -37,6 +36,7 @@ export default function LoginForm() {
     let auth: ReturnType<typeof getFirebaseAuth> | null = null;
     try {
       auth = getFirebaseAuth();
+      const { inMemoryPersistence, setPersistence, signInWithEmailAndPassword } = await import("firebase/auth");
       await setPersistence(auth, inMemoryPersistence);
       const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const idToken = await credential.user.getIdToken();
@@ -62,7 +62,14 @@ export default function LoginForm() {
     } catch (error) {
       setErrorMessage(authErrorMessage(error));
     } finally {
-      if (auth) await signOut(auth).catch(() => undefined);
+      if (auth) {
+        try {
+          const { signOut } = await import("firebase/auth");
+          await signOut(auth).catch(() => undefined);
+        } catch {
+          // ignore cleanup errors
+        }
+      }
       setIsSubmitting(false);
     }
   }
