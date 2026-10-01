@@ -323,3 +323,23 @@ Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerin
 - Yerel anonim HTTP isteği `GET /admin` → ✅ `307 /login`; `GET /login` → ✅ `200`.
 - Yerel tarayıcıda login ekranı ve popup görsel olarak incelendi. Boş form gönderiminde popup ekran ortasında; X ve Tamam düğmeleri erişilebilir durumda.
 - Yönetici hesabı, Firebase Console Email/Password ayarı ve `ADMIN_EMAIL` henüz yapılandırılmadığı için başarılı giriş, authenticated redirect ve canlı Firestore listesi uçtan uca doğrulanmadı.
+
+---
+
+## 2026-10-01 14:10–14:17 — Vercel Analytics entegrasyonu
+
+**Araç:** Codex
+**İstek:** Vercel Analytics paketini kurup Next.js layout'una ekle; Gemini'nin eş zamanlı çalışmasıyla çakışma olmasın.
+
+### Karar
+- Önce çalışma ağacını kontrol ettim; başlangıçta Gemini'den veya başka bir işlemden açık değişiklik yoktu. Yalnızca bağımlılık dosyaları ve kök layout üzerinde çalıştım.
+- Daha önce Analytics kapsam dışı bırakılmıştı; kullanıcı bu aşamada açıkça istediği için entegrasyonu ekledim.
+
+### Yapılan iş
+- `@vercel/analytics@2.0.1` bağımlılığını `package.json` ve `package-lock.json` dosyalarına ekledim.
+- `src/app/layout.tsx`: `Analytics` bileşenini ortak kök layout'ta, sayfa içeriğinin ardından kullandım.
+
+### Doğrulama
+- `npm run lint` → ✅ Başarılı.
+- `npm run build` → ✅ Başarılı; statik ve dinamik route'lar üretildi.
+- Analytics'in Vercel panelinde veri topladığı henüz canlı deployment üzerinden doğrulanmadı.
