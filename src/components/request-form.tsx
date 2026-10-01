@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
 import { requestSchema } from "@/lib/request-schema";
 import { services } from "@/lib/services";
@@ -14,7 +14,14 @@ type FormValues = {
 
 type FieldName = keyof FormValues;
 type FormErrors = Partial<Record<FieldName, string>>;
-type SubmissionState = "idle" | "submitting" | "success" | "error";
+type SubmissionState = "idle" | "submitting";
+type ResultNotice = {
+  title: string;
+  statusCode: number | null;
+  message: string;
+  requestId?: string;
+  success: boolean;
+};
 
 const initialValues: FormValues = {
   name: "",
@@ -34,8 +41,37 @@ export default function RequestForm() {
   const [values, setValues] = useState<FormValues>(initialValues);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submissionState, setSubmissionState] = useState<SubmissionState>("idle");
-  const [statusMessage, setStatusMessage] = useState("");
-  const [requestId, setRequestId] = useState("");
+  const [resultNotice, setResultNotice] = useState<ResultNotice | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const focusAfterDialogClose = useRef<FieldName | null>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (resultNotice && !dialog.open) {
+      dialog.showModal();
+    } else if (!resultNotice && dialog.open) {
+      dialog.close();
+    }
+  }, [resultNotice]);
+
+  function closeResultNotice() {
+    setResultNotice(null);
+  }
+
+  function handleDialogClose() {
+    const fieldToFocus = focusAfterDialogClose.current;
+    focusAfterDialogClose.current = null;
+    if (fieldToFocus) {
+      window.requestAnimationFrame(() => document.getElementById(fieldIds[fieldToFocus])?.focus());
+    }
+  }
+
+  function handleDialogCancel(event: React.SyntheticEvent<HTMLDialogElement>) {
+    event.preventDefault();
+    closeResultNotice();
+  }
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
     const { name, value } = event.currentTarget;
@@ -46,18 +82,12 @@ export default function RequestForm() {
       delete next[fieldName];
       return next;
     });
-    if (submissionState === "error" || submissionState === "success") {
-      setSubmissionState("idle");
-      setStatusMessage("");
-      setRequestId("");
-    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrors({});
-    setStatusMessage("");
-    setRequestId("");
+    setResultNotice(null);
 
     const parsed = requestSchema.safeParse(values);
     if (!parsed.success) {
@@ -70,11 +100,14 @@ export default function RequestForm() {
         }
       }
       setErrors(nextErrors);
-      setSubmissionState("error");
-      setStatusMessage("Lütfen işaretli alanları kontrol edin.");
-
       const firstInvalidField = Object.keys(nextErrors)[0] as FieldName | undefined;
-      if (firstInvalidField) document.getElementById(fieldIds[firstInvalidField])?.focus();
+      focusAfterDialogClose.current = firstInvalidField ?? null;
+      setResultNotice({
+        title: "Doğrulama başarısız",
+        statusCode: 400,
+        message: Object.values(nextErrors).join(" ") || "İşaretli alanları kontrol edip yeniden deneyin.",
+        success: false,
+      });
       return;
     }
 
@@ -100,38 +133,58 @@ export default function RequestForm() {
       }
 
       if (response.status === 201 && result && result.success === true && typeof result.requestId === "string" && result.requestId.length > 0) {
-        setRequestId(result.requestId);
-        setSubmissionState("success");
-        setStatusMessage("Talebiniz kaydedildi.");
+        setValues(initialValues);
+        setErrors({});
+        setSubmissionState("idle");
+        setResultNotice({
+          title: "Başarılı",
+          statusCode: response.status,
+          message: "Talebiniz kaydedildi.",
+          requestId: result.requestId,
+          success: true,
+        });
         return;
       }
 
       // Handle specific HTTP error statuses
-      setSubmissionState("error");
       const serverErrorMessage = typeof result?.error === "string" ? result.error : null;
-
+      let title = "İstek başarısız";
+      let message: string;
       if (response.status === 400) {
-        setStatusMessage(serverErrorMessage ?? "Form alanlarını kontrol edip yeniden deneyin.");
+        title = "İstek geçersiz";
+        message = serverErrorMessage ?? "Form alanlarını kontrol edip yeniden deneyin.";
       } else if (response.status === 413) {
-        setStatusMessage(serverErrorMessage ?? "İstek boyutu izin verilen sınırı aşıyor.");
+        title = "İstek çok büyük";
+        message = serverErrorMessage ?? "İstek boyutu izin verilen sınırı aşıyor.";
       } else if (response.status === 415) {
-        setStatusMessage(serverErrorMessage ?? "İstek JSON biçiminde olmalı.");
+        title = "İstek biçimi desteklenmiyor";
+        message = serverErrorMessage ?? "İstek JSON biçiminde olmalı.";
       } else if (response.status === 500) {
-        setStatusMessage(serverErrorMessage ?? "Talebiniz şu anda kaydedilemedi. Lütfen biraz sonra yeniden deneyin.");
+        title = "Sunucu hatası";
+        message = serverErrorMessage ?? "Talebiniz şu anda kaydedilemedi. Lütfen biraz sonra yeniden deneyin.";
       } else {
-        setStatusMessage(serverErrorMessage ?? `Beklenmeyen bir hata oluştu (Kod: ${response.status}). Lütfen tekrar deneyin.`);
+        message = serverErrorMessage ?? "Beklenmeyen bir yanıt alındı. Lütfen tekrar deneyin.";
       }
+      setResultNotice({ title, statusCode: response.status, message, success: false });
     } catch (error) {
-      setSubmissionState("error");
       if (error instanceof DOMException && error.name === "AbortError") {
-        setStatusMessage("İstek zaman aşımına uğradı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin.");
+        setResultNotice({
+          title: "İstek zaman aşımına uğradı",
+          statusCode: null,
+          message: "Sunucudan yanıt alınamadı. Kayıt oluşmuş olabileceğinden tekrar göndermeden önce Firestore'u kontrol edin.",
+          success: false,
+        });
       } else {
-        setStatusMessage(
-          "Sunucuya ulaşılamadı. Ağ hatasında kayıt oluşmuş olabilir; tekrar göndermeden önce bağlantınızı kontrol edin.",
-        );
+        setResultNotice({
+          title: "Bağlantı hatası",
+          statusCode: null,
+          message: "Sunucuya ulaşılamadı. Kayıt oluşmuş olabileceğinden tekrar göndermeden önce kontrol edin.",
+          success: false,
+        });
       }
     } finally {
       window.clearTimeout(timeoutId);
+      setSubmissionState("idle");
     }
   }
 
@@ -148,7 +201,8 @@ export default function RequestForm() {
   }
 
   return (
-    <form className="request-form" onSubmit={handleSubmit} noValidate>
+    <>
+      <form className="request-form" onSubmit={handleSubmit} noValidate>
       <div className="form-row">
         <div className="form-field">
           <label htmlFor={fieldIds.name}>Adınız</label>
@@ -221,17 +275,41 @@ export default function RequestForm() {
         </svg>
       </button>
 
-      <div
-        aria-live={submissionState === "error" ? "assertive" : "polite"}
-        className="form-status"
-        role={submissionState === "error" ? "alert" : "status"}
+      </form>
+
+      <dialog
+        aria-labelledby="request-result-title"
+        aria-describedby="request-result-message"
+        className={`result-dialog${resultNotice?.success ? " result-dialog-success" : ""}`}
+        onCancel={handleDialogCancel}
+        onClose={handleDialogClose}
+        ref={dialogRef}
       >
-        {submissionState === "success" ? (
-          <>
-            {statusMessage} Kayıt numarası: <strong>{requestId}</strong>
-          </>
-        ) : statusMessage}
-      </div>
-    </form>
+        {resultNotice && (
+          <div className="result-dialog-content">
+            <span aria-hidden="true" className="result-dialog-mark">
+              {resultNotice.success ? "✓" : "!"}
+            </span>
+            <div className="result-dialog-heading">
+              <h2 id="request-result-title">{resultNotice.title}</h2>
+              <span className="result-dialog-code">
+                {resultNotice.statusCode === null ? "HTTP yanıtı yok" : `HTTP ${resultNotice.statusCode}`}
+              </span>
+            </div>
+            <p className="result-dialog-message" id="request-result-message">{resultNotice.message}</p>
+            {resultNotice.requestId && (
+              <div className="result-dialog-request-id">
+                <span>Kayıt numarası</span>
+                <strong>{resultNotice.requestId}</strong>
+              </div>
+            )}
+            <button autoFocus className="result-dialog-confirm" onClick={closeResultNotice} type="button">
+              Tamam
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        )}
+      </dialog>
+    </>
   );
 }

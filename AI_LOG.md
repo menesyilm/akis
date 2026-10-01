@@ -272,3 +272,28 @@ Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerin
 ### Doğrulama
 - Kullanıcının 2026-10-01 tarihinde paylaştığı ekran görüntüsünde canlı sayfa adresi ve formun başarı mesajı görünür.
 - Deployment SHA eşleşmesi ayrıca doğrulanmadı.
+
+---
+
+## 2026-10-01 13:20–13:29 — Talep sonucu penceresi ve başarılı gönderim sonrası form temizliği
+
+**Araç:** Codex
+**İstek:** Form sonucunu palete uygun bir popup'ta göster; başlıkta durumu ve HTTP kodunu, içerikte hata nedenini veya kayıt numarasını ver; Tamam düğmesi ekle ve başarılı gönderimden sonra formu temizle.
+
+### Karar
+- Başarısız gönderimde alanları korudum; kullanıcı mesajını düzeltebilsin. Formu yalnızca API `201` ve geçerli kayıt numarasıyla başarıyı doğruladığında temizliyorum.
+- Gerçek bir HTTP yanıtı olmayan ağ/zaman aşımı durumlarını `HTTP yanıtı yok` şeklinde etiketledim; olmayan bir kodu üretmedim.
+- Erişilebilirlik için native `dialog` kullandım; Escape ve Tamam ile kapanıyor, doğrulama hatası kapandıktan sonra ilk hatalı alana odak dönüyor.
+
+### Yapılan iş
+- `src/components/request-form.tsx`: Küçük inline durum satırı kaldırıldı; 201 başarı, API'nin tüm yanıt durumları, yerel 400 doğrulaması ve bağlantı/zaman aşımı için sonuç penceresi eklendi.
+- `src/app/globals.css`: Pencereyi pine/sage/paper/lime paleti, mobil genişlik sınırı, durum kodu rozeti, kayıt numarası paneli ve görünür odak stiliyle tasarladım.
+- `src/components/request-form.tsx`: Başarılı API sonucu sonrası alanları, hata mesajlarını ve karakter sayacını sıfırladım; başarısızlıkta form değerlerini korudum.
+- `README.md`: Sonuç penceresi ve formun başarı sonrası sıfırlanma davranışı belgelendi.
+
+### Doğrulama
+- `npm run build` → ✅ Başarılı.
+- `npm run lint` → ✅ Başarılı.
+- `git diff --check` → ✅ Başarılı.
+- Yerel tarayıcıda boş form gönderimi → ✅ Doğrulama penceresinde `HTTP 400` ve neden gösterildi; Tamam sonrası ilk hatalı Adınız alanına odak döndü.
+- Gerçek Firestore'a yeni başarılı deneme kaydı gönderilmedi; başarı akışı API yanıtına göre kod üzerinden doğrulandı.

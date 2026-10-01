@@ -11,7 +11,7 @@ Akış, küçük işletmelerin sipariş takibi, raporlama ve görev/hatırlatma 
 - Vitest: şema ve API davranış testleri.
 - Vercel: dağıtım hedefi.
 
-Form `POST /api/requests` isteği gönderir. Sunucu içerik türünü ve gövde boyutunu denetler, honeypot alanını ve Zod şemasını doğrular, ardından Firestore'da `requests/{id}` belgesi oluşturur. Yalnızca Firestore yazımı tamamlanınca `201` ve `{ "success": true, "requestId": "..." }` döner. Belge `name`, `email`, `service`, `description`, `createdAt` ve `status: "new"` alanlarını içerir. İstemciden tarih, durum veya belge kimliği kabul edilmez.
+Form `POST /api/requests` isteği gönderir. Sunucu içerik türünü ve gövde boyutunu denetler, honeypot alanını ve Zod şemasını doğrular, ardından Firestore'da `requests/{id}` belgesi oluşturur. Yalnızca Firestore yazımı tamamlanınca `201` ve `{ "success": true, "requestId": "..." }` döner. Belge `name`, `email`, `service`, `description`, `createdAt` ve `status: "new"` alanlarını içerir. İstemciden tarih, durum veya belge kimliği kabul edilmez. Başarı, HTTP hata kodu, istemci doğrulaması ve bağlantı hataları sonuç penceresinde gösterilir; form yalnızca doğrulanmış başarıdan sonra temizlenir.
 
 ## Yerel kurulum
 
