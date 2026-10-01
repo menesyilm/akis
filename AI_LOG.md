@@ -528,3 +528,29 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - Public GitHub repo API → ✅ HTTP 200, public, varsayılan branch main.
 - Git tarafından takip edilen dosyalarda private key taraması → ✅ Bulgu yok; gerçek değerler çıktıya alınmadı.
 - Canlı commit ve gerçek Firestore kanıtı → ⏳ Push/deployment sonrası kaydedilecek.
+
+---
+
+## 2026-10-01 — CI typecheck hatası düzeltmesi
+
+**Araç:** Claude Codex
+**Süre:** ~12 dakika
+
+### İstek
+- Başarısız GitHub Actions job logunu inceleyip kök nedeni bul ve düzelt.
+
+### AI önerisi → Kararım
+- AI `src/app/layout.tsx` içinde `LayoutProps<'/'>` kullanımını gördü ve `tsc --noEmit` adımında global helper üretilmediği için `TS2304` oluştuğunu önerdi → **Kabul** ettim çünkü job logundaki tek kırılma bu satırdı.
+- AI `typecheck` scriptine `next typegen` eklemeyi alternatif olarak önerdi → **Değiştirdim**: script yerine root layout tipini `children: React.ReactNode` yaptım çünkü daha küçük ve doğrudan bir düzeltme.
+- AI ilişkili kontroller olarak lint ve testi de yeniden çalıştırmayı önerdi → **Kabul** ettim; değişiklik sonrası regresyon olmadığını doğruladı.
+
+### Yapılan iş
+- `src/app/layout.tsx`: `RootLayout` parametre tipi `LayoutProps<'/'>` yerine `children: React.ReactNode` olacak şekilde güncellendi.
+
+### Doğrulama
+- `npm run typecheck` → ✅ Başarılı (TS2304 hatası giderildi).
+- `npm run test` → ✅ 36/36 test geçti.
+- `npm run lint` → ✅ Başarılı.
+
+### Kalan
+- `parallel_validation` çalıştırılacak ve sonuçları kontrol edilecek.
