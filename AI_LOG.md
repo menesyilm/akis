@@ -141,3 +141,33 @@ Mobil sidebar'da 03 "Birlikte konuşalım" butonunun koyu arka planı yarıda ke
 - Yerel API'de geçersiz payload → HTTP 400.
 - Geçerli test talebinin Firestore yazma yanıtı yakalanamadı; doğrudan Firestore geri okuma denemesi de tamamlanmadı. Başarılı yazma doğrulanmış değil; zaman aşımından önce kayıt oluşmuş olabileceği için tekrar göndermeden önce Firestore Console kontrol edilmeli.
 - Vitest testleri henüz eklenmedi/çalıştırılmadı; planın sonraki test aşamasında ele alınacak.
+
+---
+
+## 2026-10-01 — Scroll ve hover animasyonları
+
+**Araç:** Antigravity (Claude Opus)
+**Süre:** ~15 dakika
+
+### İstek
+Sayfadaki tüm yazılar ve bölümler scroll ile viewport'a girince animasyonlu gelsin; viewport'tan çıkıp tekrar girince animasyon tekrar tetiklensin. Hero kartları ve hizmet kartları hover'da yukarı kalksın.
+
+### AI önerisi → Kararım
+- AI önce custom IntersectionObserver ile Reveal component önerdi → **Değiştirdim**: kullanıcı "react animasyon kütüphanesi kullanabilirsin" dedi; Framer Motion'a geçtim.
+- AI `framer-motion` paketi önerdi (`whileInView`, `whileHover`, `variants` API'leri) → **Kabul** ettim; scroll re-trigger (`once: false`) ve stagger animasyonları tek API'de temiz çözülüyor.
+- AI hero kartlarını CSS hover ile yapmayı önerdi → **Değiştirdim**: kartlarda CSS `transform: rotate()` zaten var; framer-motion'ın `whileHover` ile `rotate` + `y` bağımsız kontrol daha güvenli.
+- AI hizmet kartlarında `staggerChildren: 0.12` önerdi → **Kabul** ettim; 3 kart sırayla belirmesi görsel olarak daha iyi.
+
+### Yapılan iş
+- `framer-motion` paketi kuruldu
+- `src/components/reveal.tsx`: `motion.div` + `whileInView` ile genel scroll reveal wrapper (up/down/left/right/scale varyantları, delay desteği)
+- `src/components/hero-cards.tsx`: Hero kartları client component; `whileHover` ile spring animasyonlu yukarı kalkma + rotasyon
+- `src/components/service-grid.tsx`: Hizmet kartları stagger animasyonlu scroll reveal + `whileHover` lift efekti
+- `src/components/steps-list.tsx`: Süreç adımları stagger animasyonlu sağdan kayma
+- `src/app/page.tsx`: Tüm bölümlere Reveal wrapper'ları eklendi (hero text → staggered, hero art → soldan, hizmet başlığı, süreç başlığı, iletişim, footer)
+- `src/app/globals.css`: Flow card hover shadow, service card transition, step hover highlight eklendi
+
+### Doğrulama
+- İlk `npm run build` → ❌ TypeScript hatası (`springTransition.type` string literal gerekiyor)
+- `as const` assertion ile düzeltme → `npm run build` → ✅ Başarılı
+- Tarayıcı görsel kontrol → ⏳ Kullanıcı doğrulayacak

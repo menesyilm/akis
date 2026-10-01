@@ -1,6 +1,32 @@
 import SiteNav from "@/components/site-nav";
-import RequestForm from "@/components/request-form";
-import { services } from "@/lib/services";
+import Reveal from "@/components/reveal";
+import HeroCards from "@/components/hero-cards";
+import ServiceGrid from "@/components/service-grid";
+import StepsList from "@/components/steps-list";
+
+const services = [
+  {
+    number: "01",
+    title: "Sipariş takibi",
+    description:
+      "Farklı kanallardan gelen siparişleri tek bir akışta toplayın. Ekibiniz, her işin hangi aşamada olduğunu kolayca görsün.",
+    icon: "↗",
+  },
+  {
+    number: "02",
+    title: "Raporlama",
+    description:
+      "Tekrarlanan rapor hazırlığını otomatikleştirin. İhtiyacınız olan bilgiler, doğru zamanda ve düzenli biçimde elinizde olsun.",
+    icon: "▤",
+  },
+  {
+    number: "03",
+    title: "Görev ve hatırlatma",
+    description:
+      "İşleri doğru kişiye, doğru zamanda ulaştırın. Takip gerektiren adımlar gözden kaçmasın.",
+    icon: "◷",
+  },
+];
 
 const steps = [
   {
@@ -44,44 +70,36 @@ export default function Home() {
 
       <section className="hero" id="baslangic" aria-labelledby="hero-title">
         <div className="hero-copy">
-          <p className="eyebrow"><span /> Küçük işler, daha akıcı bir gün</p>
-          <h1 id="hero-title">
-            Tekrar eden işleri
-            <br />
-            <span>otomatikleştirin.</span>
-          </h1>
-          <p className="hero-description">
-            Sipariş takibi, raporlama ve günlük görevler daha düzenli ilerlesin.
-            Siz işinize zaman ayırın.
-          </p>
-          <a className="button button-dark" href="#talep">
-            İhtiyacını anlat <ArrowIcon />
-          </a>
-          <div className="hero-note">
-            <span className="note-line" />
-            İşletmenize göre şekillenen pratik çözümler
-          </div>
+          <Reveal>
+            <p className="eyebrow"><span /> Küçük işler, daha akıcı bir gün</p>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <h1 id="hero-title">
+              Tekrar eden işleri
+              <br />
+              <span>otomatikleştirin.</span>
+            </h1>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <p className="hero-description">
+              Sipariş takibi, raporlama ve günlük görevler daha düzenli ilerlesin.
+              Siz işinize zaman ayırın.
+            </p>
+          </Reveal>
+          <Reveal delay={0.3}>
+            <a className="button button-dark" href="#talep">
+              İhtiyacını anlat <ArrowIcon />
+            </a>
+            <div className="hero-note">
+              <span className="note-line" />
+              İşletmenize göre şekillenen pratik çözümler
+            </div>
+          </Reveal>
         </div>
 
-        <div className="hero-art" aria-hidden="true">
-          <div className="art-orbit orbit-one" />
-          <div className="art-orbit orbit-two" />
-          <div className="flow-card card-back">
-            <span className="flow-label">BUGÜNÜN AKIŞI</span>
-            <span className="flow-line"><i /> Sipariş alındı</span>
-            <span className="flow-line"><i /> Rapor hazırlandı</span>
-            <span className="flow-line"><i /> Görev hatırlatıldı</span>
-          </div>
-          <div className="flow-card card-front">
-            <span className="card-spark">✳</span>
-            <span className="flow-label">DAHA AZ TEKRAR</span>
-            <strong>Daha çok<br />işinize odaklanın.</strong>
-            <span className="card-footer"><span /> Akışınız düzene giriyor</span>
-          </div>
-          <span className="art-dot dot-one" />
-          <span className="art-dot dot-two" />
-          <span className="art-cross">＋</span>
-        </div>
+        <Reveal variant="left" delay={0.2}>
+          <HeroCards />
+        </Reveal>
 
         <div className="hero-bottom" aria-hidden="true">
           <span>İşin akışını iyileştir</span>
@@ -91,72 +109,64 @@ export default function Home() {
       </section>
 
       <section className="services section-wrap" id="hizmetler" aria-labelledby="services-title">
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow"><span /> Neler kolaylaşabilir?</p>
-            <h2 id="services-title">İşin akışını<br />birlikte <em>iyileştirelim.</em></h2>
+        <Reveal>
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow"><span /> Neler kolaylaşabilir?</p>
+              <h2 id="services-title">İşin akışını<br />birlikte <em>iyileştirelim.</em></h2>
+            </div>
+            <p className="section-intro">
+              Her işletmenin iş yapış biçimi farklı. Tekrarlanan adımları
+              anlayıp size uygun otomasyon fırsatlarını birlikte bulalım.
+            </p>
           </div>
-          <p className="section-intro">
-            Her işletmenin iş yapış biçimi farklı. Tekrarlanan adımları
-            anlayıp size uygun otomasyon fırsatlarını birlikte bulalım.
-          </p>
-        </div>
+        </Reveal>
 
-        <div className="service-grid">
-          {services.map((service, index) => (
-            <article className="service-card" key={service.id}>
-              <div className="service-card-top">
-                <span className="service-number">0{index + 1}</span>
-                <span className="service-icon" aria-hidden="true">{service.icon}</span>
-              </div>
-              <h3>{service.title}</h3>
-              <p>{service.description}</p>
-              <span className="service-rule" />
-            </article>
-          ))}
-        </div>
+        <ServiceGrid services={services} />
       </section>
 
       <section className="process" id="surec" aria-labelledby="process-title">
         <div className="section-wrap process-inner">
-          <div className="process-heading">
-            <p className="eyebrow eyebrow-light"><span /> Karmaşık değil, birlikte</p>
-            <h2 id="process-title">Önce sizi<br /><em>dinliyoruz.</em></h2>
-            <p>İyi bir çözüm, işinizin bugün nasıl yürüdüğünü anlamakla başlar.</p>
-          </div>
-          <ol className="steps-list">
-            {steps.map((step) => (
-              <li className="step" key={step.number}>
-                <span className="step-number">{step.number}</span>
-                <div>
-                  <h3>{step.title}</h3>
-                  <p>{step.description}</p>
-                </div>
-                <span className="step-arrow" aria-hidden="true">↗</span>
-              </li>
-            ))}
-          </ol>
+          <Reveal>
+            <div className="process-heading">
+              <p className="eyebrow eyebrow-light"><span /> Karmaşık değil, birlikte</p>
+              <h2 id="process-title">Önce sizi<br /><em>dinliyoruz.</em></h2>
+              <p>İyi bir çözüm, işinizin bugün nasıl yürüdüğünü anlamakla başlar.</p>
+            </div>
+          </Reveal>
+          <StepsList steps={steps} />
         </div>
       </section>
 
       <section className="contact section-wrap" id="talep" aria-labelledby="contact-title">
-        <div className="contact-copy">
-          <p className="eyebrow"><span /> İlk adım sizden</p>
-          <h2 id="contact-title">İşinizi kolaylaştıracak<br /><em>bir yerden başlayalım.</em></h2>
-          <p>İhtiyacınızı anlatın; size uygun olabilecek adımları birlikte değerlendirelim.</p>
-        </div>
-        <RequestForm />
+        <Reveal>
+          <div className="contact-copy">
+            <p className="eyebrow"><span /> İlk adım sizden</p>
+            <h2 id="contact-title">İşinizi kolaylaştıracak<br /><em>bir yerden başlayalım.</em></h2>
+            <p>İhtiyacınızı anlatın; size uygun olabilecek adımları birlikte değerlendirelim.</p>
+          </div>
+        </Reveal>
+        <Reveal variant="scale" delay={0.15}>
+          <div className="contact-panel">
+            <span className="panel-index">AKIŞ / 01</span>
+            <span className="panel-symbol" aria-hidden="true">↗</span>
+            <p>Talep formu hazırlanıyor.</p>
+            <span className="panel-caption">Formu bir sonraki adımda güvenli kayıt akışına bağlayacağız.</span>
+          </div>
+        </Reveal>
       </section>
 
-      <footer className="site-footer">
-        <a className="brand footer-brand" href="#baslangic" aria-label="Akış sayfa başına dön">
-          <span className="brand-mark" aria-hidden="true">a<span>.</span></span>
-          <span>akış</span>
-        </a>
-        <p>Tekrarlayan işleri otomatikleştirin, işinize zaman ayırın.</p>
-        <a href="#baslangic" className="back-top">Başa dön ↑</a>
-        <span className="footer-note">Kurgusal değerlendirme projesi</span>
-      </footer>
+      <Reveal>
+        <footer className="site-footer">
+          <a className="brand footer-brand" href="#baslangic" aria-label="Akış sayfa başına dön">
+            <span className="brand-mark" aria-hidden="true">a<span>.</span></span>
+            <span>akış</span>
+          </a>
+          <p>Tekrarlayan işleri otomatikleştirin, işinize zaman ayırın.</p>
+          <a href="#baslangic" className="back-top">Başa dön ↑</a>
+          <span className="footer-note">Kurgusal değerlendirme projesi</span>
+        </footer>
+      </Reveal>
     </main>
   );
 }
