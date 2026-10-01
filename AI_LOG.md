@@ -527,4 +527,13 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - Local production `require(ESM)` kapalıyken tarayıcıda boş form, native modal menü ve Escape → ✅ Çalıştı; 375 px yatay taşma görülmedi.
 - Public GitHub repo API → ✅ HTTP 200, public, varsayılan branch main.
 - Git tarafından takip edilen dosyalarda private key taraması → ✅ Bulgu yok; gerçek değerler çıktıya alınmadı.
-- Canlı commit ve gerçek Firestore kanıtı → ⏳ Push/deployment sonrası kaydedilecek.
+- Source commit `c97982aa40222540f6b15e9b499eff5f953e57c0` pushlandı; GitHub Vercel status success, production `/api/health` aynı SHA → ✅.
+- Canlı 200/307/400/401/403/413/415/201 davranışları; API ID `MwjUZLzA1VyNO4YOKNRd` ile Firestore geri okuma ve yenileme sonrası kalıcılık → ✅.
+- Canlı tarayıcı gönderiliyor/başarı/form temizliği; UI ID `nytNIK9m696ifBlVqqQ6` ile Firestore eşleştirmesi; anonim Firestore okuma 403; mobil menü arka plan izolasyonu/Escape/focus ve tablet görünümü → ✅.
+- `LIVE_VERIFICATION.json` ve `docs/live-success.jpg`: yalnızca kurgusal test kanıtı; mevcut kayıtlar silinmedi.
+- GitHub CI ilk temiz kurulumda typecheck aşamasında `Cannot find name LayoutProps` hatası verdi → ❌. Yerel build'in ürettiği tipler eksikliği gizliyordu; `next typegen && tsc --noEmit` ile düzeltildi, yerel typecheck/lint tekrar geçti → ✅. İkinci push sonrası CI sonucu ayrıca doğrulanacak.
+
+### Son yeniden tarama ve sınırlar
+- Ana gereksinimlerde bilinen açık çalışmama bulgusu kalmadı. Sıfır hata garantisi verilmedi; gerçek admin hesabı şifresiyle giriş/silme, tam ekran okuyucu/cihaz matrisi ve adayın geçmiş proje bilgileri bu oturumda test edilmedi veya uydurulmadı.
+- Dağıtık rate limiting, idempotency ve 100 kayıt sonrası sayfalama belgeli kapsam sınırlarıdır; bunlar temel değerlendirme gereksinimleri değil.
+- Toplam süre beyanı: önceki kayıtlı yaklaşık 4 saate bu son oturumun duvar süresi ayrıca eklenir; eksiksiz aktif emek toplamı diye sunulmaz.

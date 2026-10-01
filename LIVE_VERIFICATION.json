@@ -1,0 +1,70 @@
+{
+  "checkedAt": "2026-10-01T13:04:23.228Z",
+  "base": "https://enteksis-akis.vercel.app",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "path": "/admin",
+      "status": 307
+    },
+    {
+      "path": "/api/health",
+      "status": 200
+    },
+    {
+      "path": "/api/requests",
+      "status": 415
+    },
+    {
+      "path": "/api/requests",
+      "status": 400
+    },
+    {
+      "path": "/api/requests",
+      "status": 413
+    },
+    {
+      "path": "/api/requests",
+      "status": 400
+    },
+    {
+      "path": "/api/admin/requests/proof-test",
+      "status": 401
+    },
+    {
+      "path": "/api/auth/session",
+      "status": 403
+    },
+    {
+      "path": "/api/requests",
+      "status": 201
+    },
+    {
+      "path": "/",
+      "status": 200
+    }
+  ],
+  "commit": "c97982aa40222540f6b15e9b499eff5f953e57c0",
+  "requestId": "MwjUZLzA1VyNO4YOKNRd",
+  "persistence": {
+    "firstRead": true,
+    "afterReload": true,
+    "status": "new",
+    "createdAt": "2026-10-01T13:04:31.828Z"
+  },
+  "anonymousFirestoreRead": 403,
+  "browser": {
+    "requestId": "nytNIK9m696ifBlVqqQ6",
+    "persisted": true,
+    "formReset": true,
+    "mobileMenuModal": true,
+    "mobileEscapeFocus": true
+  }
+}

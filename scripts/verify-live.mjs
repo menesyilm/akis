@@ -49,6 +49,9 @@ const saved = await (await check("/api/requests", 201, {
 })).json();
 assert.equal(saved.success, true); assert.ok(saved.requestId);
 proof.requestId = saved.requestId;
+const anonymousRead = await fetch(`https://firestore.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/databases/(default)/documents/requests/${saved.requestId}`, { signal: AbortSignal.timeout(30_000) });
+assert.equal(anonymousRead.status, 403, "Firestore must reject anonymous document reads");
+proof.anonymousFirestoreRead = anonymousRead.status;
 const document = database.collection("requests").doc(saved.requestId);
 const first = await document.get();
 assert.ok(first.exists);

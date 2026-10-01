@@ -99,7 +99,7 @@ Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresini açın.
 | `npm run dev` | Yerel geliştirme sunucusunu başlatır (`localhost:3000`) |
 | `npm run test` | Vitest ile tüm birim ve entegrasyon testlerini çalıştırır |
 | `npm run lint` | ESLint ile kod kalitesi ve stil denetimi yapar |
-| `npm run typecheck` | TypeScript derleme ve tip kontrollerini çalıştırır (`tsc --noEmit`) |
+| `npm run typecheck` | Next.js route tiplerini üretip TypeScript kontrolünü çalıştırır (`next typegen && tsc --noEmit`) |
 | `npm run build` | Üretim derlemesini optimize eder ve statik sayfaları üretir |
 | `npm run start` | Derlenmiş üretim sürümünü yerelde çalıştırır |
 
@@ -135,8 +135,10 @@ Firebase Authentication'da Email/Password sağlayıcısını etkinleştirin; yö
 
 Test süiti [tests/](./tests) dizininde yer almakta olup `npm run test` ile çalıştırılır:
 - **Şema Testleri (`tests/request-schema.test.ts`):** 8 test (Geçerli veri, trim, kısa/uzun ad, geçersiz e-posta, geçersiz hizmet, kısa/uzun açıklama).
-- **API Rota Testleri (`tests/requests-route.test.ts`):** 6 test (415 Content-Type, 400 bozuk JSON, 400 honeypot, 400 validasyon, 201 başarılı kayıt, 500 DB hatasında iç detay ifşa etmeme).
+- **API Rota Testleri (`tests/requests-route.test.ts`):** 9 test: Content-Type, bozuk JSON, honeypot, validasyon, 201/500; Content-Length ve gerçek stream boyut sınırı; yazma tamamlanmadan başarı dönmemesi.
 - **Runtime Uyumluluk Testi (`tests/firebase-runtime.test.ts`):** `require(ESM)` kapalıyken Firebase Admin yükleme, JWKS anahtarıyla imza doğrulama ve değiştirilmiş token reddi.
+- **Admin Güvenlik Testleri (`tests/admin-auth.test.ts`):** 17 test; allowlist, origin, token yaşı, güvenli cookie, logout, oturum gövde sınırı ve silme yetkileri.
+- **Güvenli Log Testi (`tests/error-log.test.ts`):** Hata mesajı, token ve anahtarın loglanmaması.
 - **Sonuç:** 2026-10-01 yeniden kontrolünde 5 dosya, 36/36 test; lint, typecheck ve production build başarılı.
 - API testleri repository'yi mock eder; gerçek Firestore yazma ve kalıcılık kanıtı yerine geçmez.
 
@@ -165,7 +167,7 @@ Tüm geliştirme süreci, AI yönlendirmeleri, kabul edilen/reddedilen mimari ka
 - Yönetici paneli son 100 kaydı listeler; sayfalama ve arama yoktur. Silme kalıcıdır.
 - Vurgu metni `#596544` ile yaklaşık 5.69:1 kontrasta sahiptir. Framer Motion reduced-motion tercihini kullanır; SSR içeriği başlangıçta gizlenmez. Mobil menü native modal dialog ile arka planı erişilebilirlik ağacından ayırır.
 - Firebase hataları kullanıcıya genel mesaj olarak döner. Sunucu loglarına yalnızca işlem adı ve sınırlı SDK hata kodu yazılır; mesaj, token, anahtar ve kişisel veri yazılmaz. Altyapı kaynaklı session hataları 503, geçersiz token 401 döner.
-- Bu denetimde gerçek admin hesabıyla giriş/silme, Firestore belge ID'siyle geri okuma ve yeniden yükleme sonrası kalıcılık bağımsız olarak sınanmadı. Kullanıcının canlı sorunun çözüldüğü beyanı bu kontrollerin kanıtı yerine yazılmadı.
+- Canlı API ve tarayıcı formu kurgusal verilerle başarı verdi; dönen IDler Firestoreda geri okundu, yenileme sonrası kalıcılık doğrulandı. Kanıt: [LIVE_VERIFICATION.json](./LIVE_VERIFICATION.json) ve [başarı ekranı](./docs/live-success.jpg). Yetkili admin girişi/silmesi mock testleriyle kontrol edildi; gerçek yönetici hesabıyla bu oturumda oturum açılmadı.
 - Yalnızca kurgusal test verisi kullanın: örneğin `Deneme Kullanıcısı`, `deneme@example.com`. Teslimde formun döndürdüğü kayıt ID'sini Firestore belgesiyle eşleştirin, yenilemeden sonra kaldığını doğrulayın; gerçek kişisel verileri kanıta eklemeyin.
 - Önceki AI_LOG sürelerinin çakışmalar çıkarılmış toplamı yaklaşık 4 saattir; bu, süresi yazılmayan aşamaları kapsayan eksiksiz aktif emek ölçümü değildir. Son teslim iyileştirme oturumu ayrıca günlüğe kaydedilir.
 - Teslim commit kimliği son dokümantasyon değişiklikleri commit edilip pushlandıktan sonra `git rev-parse HEAD` ile alınarak teslim alanında belirtilir. Vercel production deployment'ın aynı commit'ten çıktığı kontrol edilir; bu belgenin içine kendi commit SHA'sı yazılmaz.
