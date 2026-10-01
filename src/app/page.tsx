@@ -1,69 +1,189 @@
-import Image from "next/image";
+import SiteNav from "@/components/site-nav";
+
+const services = [
+  {
+    number: "01",
+    title: "Sipariş takibi",
+    description:
+      "Farklı kanallardan gelen siparişleri tek bir akışta toplayın. Ekibiniz, her işin hangi aşamada olduğunu kolayca görsün.",
+    icon: "↗",
+  },
+  {
+    number: "02",
+    title: "Raporlama",
+    description:
+      "Tekrarlanan rapor hazırlığını otomatikleştirin. İhtiyacınız olan bilgiler, doğru zamanda ve düzenli biçimde elinizde olsun.",
+    icon: "▤",
+  },
+  {
+    number: "03",
+    title: "Görev ve hatırlatma",
+    description:
+      "İşleri doğru kişiye, doğru zamanda ulaştırın. Takip gerektiren adımlar gözden kaçmasın.",
+    icon: "◷",
+  },
+];
+
+const steps = [
+  {
+    number: "01",
+    title: "İhtiyacını anlat",
+    description: "Bugün zamanınızı alan tekrar eden işleri birlikte belirleyelim.",
+  },
+  {
+    number: "02",
+    title: "Birlikte değerlendirelim",
+    description: "Sürecinizi anlayıp otomasyona uygun noktaları netleştirelim.",
+  },
+  {
+    number: "03",
+    title: "Çözümü planlayalım",
+    description: "İşinize uyacak sade ve uygulanabilir bir yol haritası çıkaralım.",
+  },
+];
+
+function ArrowIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none">
+      <path d="M4 10h11M10 4l6 6-6 6" />
+    </svg>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main>
+      <header className="site-header">
+        <a className="brand" href="#baslangic" aria-label="Akış ana sayfa">
+          <span className="brand-mark" aria-hidden="true">
+            a<span>.</span>
+          </span>
+          <span>akış</span>
+        </a>
+
+        <SiteNav />
+      </header>
+
+      <section className="hero" id="baslangic" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <p className="eyebrow"><span /> Küçük işler, daha akıcı bir gün</p>
+          <h1 id="hero-title">
+            Tekrar eden işleri
+            <br />
+            <span>otomatikleştirin.</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="hero-description">
+            Sipariş takibi, raporlama ve günlük görevler daha düzenli ilerlesin.
+            Siz işinize zaman ayırın.
+          </p>
+          <a className="button button-dark" href="#talep">
+            İhtiyacını anlat <ArrowIcon />
+          </a>
+          <div className="hero-note">
+            <span className="note-line" />
+            İşletmenize göre şekillenen pratik çözümler
+          </div>
+        </div>
+
+        <div className="hero-art" aria-hidden="true">
+          <div className="art-orbit orbit-one" />
+          <div className="art-orbit orbit-two" />
+          <div className="flow-card card-back">
+            <span className="flow-label">BUGÜNÜN AKIŞI</span>
+            <span className="flow-line"><i /> Sipariş alındı</span>
+            <span className="flow-line"><i /> Rapor hazırlandı</span>
+            <span className="flow-line"><i /> Görev hatırlatıldı</span>
+          </div>
+          <div className="flow-card card-front">
+            <span className="card-spark">✳</span>
+            <span className="flow-label">DAHA AZ TEKRAR</span>
+            <strong>Daha çok<br />işinize odaklanın.</strong>
+            <span className="card-footer"><span /> Akışınız düzene giriyor</span>
+          </div>
+          <span className="art-dot dot-one" />
+          <span className="art-dot dot-two" />
+          <span className="art-cross">＋</span>
+        </div>
+
+        <div className="hero-bottom" aria-hidden="true">
+          <span>İşin akışını iyileştir</span>
+          <span className="hero-bottom-line" />
+          <span>01 — 03</span>
+        </div>
+      </section>
+
+      <section className="services section-wrap" id="hizmetler" aria-labelledby="services-title">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow"><span /> Neler kolaylaşabilir?</p>
+            <h2 id="services-title">İşin akışını<br />birlikte <em>iyileştirelim.</em></h2>
+          </div>
+          <p className="section-intro">
+            Her işletmenin iş yapış biçimi farklı. Tekrarlanan adımları
+            anlayıp size uygun otomasyon fırsatlarını birlikte bulalım.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="service-grid">
+          {services.map((service) => (
+            <article className="service-card" key={service.number}>
+              <div className="service-card-top">
+                <span className="service-number">{service.number}</span>
+                <span className="service-icon" aria-hidden="true">{service.icon}</span>
+              </div>
+              <h3>{service.title}</h3>
+              <p>{service.description}</p>
+              <span className="service-rule" />
+            </article>
+          ))}
         </div>
-      </main>
-    </div>
+      </section>
+
+      <section className="process" id="surec" aria-labelledby="process-title">
+        <div className="section-wrap process-inner">
+          <div className="process-heading">
+            <p className="eyebrow eyebrow-light"><span /> Karmaşık değil, birlikte</p>
+            <h2 id="process-title">Önce sizi<br /><em>dinliyoruz.</em></h2>
+            <p>İyi bir çözüm, işinizin bugün nasıl yürüdüğünü anlamakla başlar.</p>
+          </div>
+          <ol className="steps-list">
+            {steps.map((step) => (
+              <li className="step" key={step.number}>
+                <span className="step-number">{step.number}</span>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.description}</p>
+                </div>
+                <span className="step-arrow" aria-hidden="true">↗</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="contact section-wrap" id="talep" aria-labelledby="contact-title">
+        <div className="contact-copy">
+          <p className="eyebrow"><span /> İlk adım sizden</p>
+          <h2 id="contact-title">İşinizi kolaylaştıracak<br /><em>bir yerden başlayalım.</em></h2>
+          <p>İhtiyacınızı anlatın; size uygun olabilecek adımları birlikte değerlendirelim.</p>
+        </div>
+        <div className="contact-panel">
+          <span className="panel-index">AKIŞ / 01</span>
+          <span className="panel-symbol" aria-hidden="true">↗</span>
+          <p>Talep formu hazırlanıyor.</p>
+          <span className="panel-caption">Formu bir sonraki adımda güvenli kayıt akışına bağlayacağız.</span>
+        </div>
+      </section>
+
+      <footer className="site-footer">
+        <a className="brand footer-brand" href="#baslangic" aria-label="Akış sayfa başına dön">
+          <span className="brand-mark" aria-hidden="true">a<span>.</span></span>
+          <span>akış</span>
+        </a>
+        <p>Tekrarlayan işleri otomatikleştirin, işinize zaman ayırın.</p>
+        <a href="#baslangic" className="back-top">Başa dön ↑</a>
+        <span className="footer-note">Kurgusal değerlendirme projesi</span>
+      </footer>
+    </main>
   );
 }
