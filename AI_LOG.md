@@ -343,3 +343,30 @@ Tarayıcı sekmesinde görünen varsayılan Next.js / Vercel üçgen ikonu yerin
 - `npm run lint` → ✅ Başarılı.
 - `npm run build` → ✅ Başarılı; statik ve dinamik route'lar üretildi.
 - Analytics'in Vercel panelinde veri topladığı henüz canlı deployment üzerinden doğrulanmadı.
+
+---
+
+## 2026-10-01 — Login sayfası Vercel 500 ve Localhost ADMIN_EMAIL yapılandırma düzeltmesi
+
+**Araç:** Antigravity (Gemini 3.8 Flash)
+**Süre:** ~15 dakika
+
+### İstek
+Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A server error occurred. Reload to try again." hatasını ve localhost'ta giriş yaparken karşılaşılan "Yönetici hesabı sunucu ortamında yapılandırılmamış." hatasını gider.
+
+### AI önerisi → Kararım
+- AI sadece `ADMIN_EMAIL` eklemeyi önerdi → **Değiştirdim**: Tek bir e-posta yerine virgülle ayrılmış birden fazla yönetici e-postası desteği ekledim (`admin@enteksis.com,menes.yilm@gmail.com`).
+- AI Vercel hatasını sadece ortam değişkenine bağladı → **Değiştirdim**: `login/page.tsx` ve `admin/page.tsx` rotalarına Node.js ortamı için `export const runtime = "nodejs";` ekledim; Firebase Admin SDK'nın `privateKey` parse mantığını Vercel'deki tırnaklı/tırnaksız/boşluklu olası girdilere karşı kurşun geçirmez hale getirdim ve sayfa render anındaki oturum okuma çağrısını safe try-catch bloğuna aldım.
+
+### Yapılan iş
+- `src/lib/server/firebase-admin.ts`: `privateKey` tırnak temizleme (`"`, `'`) ve escaped `\n` dönüşümü güçlendirildi.
+- `src/lib/server/admin-session.ts`: `isConfiguredAdminEmail` fonksiyonu virgülle ayrılmış çoklu e-posta ve boşluk trimlemeye dayanıklı yapıldı.
+- `src/app/login/page.tsx`: `export const runtime = "nodejs";` eklendi, `getVerifiedAdminSession` çağrısı try-catch korumasına alındı.
+- `src/app/admin/page.tsx`: `export const runtime = "nodejs";` eklendi, session doğrulama try-catch korumasına alındı.
+- `.env.local`: `ADMIN_EMAIL=admin@enteksis.com,menes.yilm@gmail.com` değeri eklendi.
+
+### Doğrulama
+- `npm run test` → ✅ 14/14 test başarılı.
+- `npm run typecheck` → ✅ Sıfır hata.
+- `npm run build` → ✅ Başarılı (statik ve dinamik rotalar optimize edildi).
+- Yerel `ADMIN_EMAIL` kontrolü → ✅ Yerel dosyada eksik olan anahtar tamamlandı.

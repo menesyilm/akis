@@ -6,6 +6,7 @@ import { listServiceRequests } from "@/lib/server/request-repository";
 import { services } from "@/lib/services";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 function serviceLabel(value: string) {
   return services.find((service) => service.id === value)?.title ?? value;
@@ -21,7 +22,12 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminPage() {
-  const session = await getVerifiedAdminSession();
+  let session = null;
+  try {
+    session = await getVerifiedAdminSession();
+  } catch {
+    session = null;
+  }
   if (!session) redirect("/login");
 
   let requests = await listServiceRequests().catch(() => null);

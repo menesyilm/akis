@@ -5,9 +5,15 @@ import LoginForm from "@/components/login-form";
 import { getVerifiedAdminSession } from "@/lib/server/admin-session";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export default async function LoginPage() {
-  const session = await getVerifiedAdminSession();
+  let session = null;
+  try {
+    session = await getVerifiedAdminSession();
+  } catch {
+    session = null;
+  }
   if (session) redirect("/admin");
 
   return (

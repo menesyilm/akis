@@ -8,8 +8,12 @@ export const ADMIN_SESSION_COOKIE = "akis_admin_session";
 export const ADMIN_SESSION_DURATION_MS = 5 * 24 * 60 * 60 * 1000;
 
 export function isConfiguredAdminEmail(email: string | undefined) {
-  const configuredEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-  return Boolean(configuredEmail && email?.trim().toLowerCase() === configuredEmail);
+  if (!email || !process.env.ADMIN_EMAIL?.trim()) return false;
+  const configuredEmails = process.env.ADMIN_EMAIL
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  return configuredEmails.includes(email.trim().toLowerCase());
 }
 
 export async function getVerifiedAdminSession() {
