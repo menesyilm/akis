@@ -322,5 +322,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--sage-text); out
 }
 
 @media (prefers-reduced-motion: reduce) {
+  [data-scroll-reveal] { opacity: 1 !important; transform: none !important; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }

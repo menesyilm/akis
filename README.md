@@ -165,7 +165,7 @@ Tüm geliştirme süreci, AI yönlendirmeleri, kabul edilen/reddedilen mimari ka
 
 - Dağıtık rate limiting, CAPTCHA ve idempotency yoktur. Honeypot ve butonun gönderim sırasında kapatılması tam spam/tekrar kayıt koruması değildir. Ağ yanıtı kaybolursa tekrar gönderim ikinci kayıt oluşturabilir.
 - Yönetici paneli son 100 kaydı listeler; sayfalama ve arama yoktur. Silme kalıcıdır.
-- Vurgu metni `#596544` ile yaklaşık 5.69:1 kontrasta sahiptir. Framer Motion reduced-motion tercihini kullanır; SSR içeriği başlangıçta gizlenmez. Mobil menü native modal dialog ile arka planı erişilebilirlik ağacından ayırır.
+- Vurgu metni `#596544` ile yaklaşık 5.69:1 kontrasta sahiptir. Framer Motion reduced-motion tercihini kullanır; JavaScript kapalıyken `noscript` stili animasyonlu içeriği görünür tutar. Mobil menü native modal dialog ile arka planı erişilebilirlik ağacından ayırır.
 - Firebase hataları kullanıcıya genel mesaj olarak döner. Sunucu loglarına yalnızca işlem adı ve sınırlı SDK hata kodu yazılır; mesaj, token, anahtar ve kişisel veri yazılmaz. Altyapı kaynaklı session hataları 503, geçersiz token 401 döner.
 - Canlı API ve tarayıcı formu kurgusal verilerle başarı verdi; dönen IDler Firestoreda geri okundu, yenileme sonrası kalıcılık doğrulandı. Kanıt: [LIVE_VERIFICATION.json](./LIVE_VERIFICATION.json) ve [başarı ekranı](./docs/live-success.jpg). Yetkili admin girişi/silmesi mock testleriyle kontrol edildi; gerçek yönetici hesabıyla bu oturumda oturum açılmadı.
 - Yalnızca kurgusal test verisi kullanın: örneğin `Deneme Kullanıcısı`, `deneme@example.com`. Teslimde formun döndürdüğü kayıt ID'sini Firestore belgesiyle eşleştirin, yenilemeden sonra kaldığını doğrulayın; gerçek kişisel verileri kanıta eklemeyin.

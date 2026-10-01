@@ -552,3 +552,11 @@ Vercel'de `https://enteksis-akis.vercel.app/login` adresinde oluşan 500 "A serv
 - 36/36 test; lint/typecheck/build; temiz Linux CI ve production commit eşleşmesi → ✅ Önceki kaynak commit'inde doğrulandı.
 - Canlı form/API/Firestore kalıcılık kanıtı → ✅ `LIVE_VERIFICATION.json` ve `docs/live-success.jpg` içinde.
 - Bu commit yalnızca son belge güncellemesini içerir. Son push/deployment SHA ve CI durum kontrolü teslim cevabından önce yapılacak; temel görev kapsamındaki bilinen çalışmama sorunu kalmadı.
+# Scroll animasyonu regresyonunun düzeltilmesi — 01.10.2026
+
+- Kullanıcı, son erişilebilirlik değişikliklerinden sonra hover çalışırken açılış ve scroll animasyonlarının kaybolduğunu bildirdi. Önceki `initial={false}` tercihim gizli başlangıç durumunu kaldırmıştı; bu öneriyi düzelttim.
+- Reveal, hizmet kartları ve süreç listesinde `hidden` başlangıç durumu geri getirildi. `once: false` korunarak ekran dışına çıkışta sıfırlama ve her iki yönde yeniden giriş sağlandı. Kartların stagger geçişi parent varyantına taşındı.
+- Azaltılmış hareket tercihi korunuyor. CSS media kuralı ilk render sırasında da içeriği görünür tutuyor; JavaScript kapalıyken `noscript` görünürlük stili uygulanıyor. README bu davranışa göre düzeltildi.
+- Üretim derlemesi tarayıcıda kontrol edildi: yenilemede hero opacity 0 ve ötelenmiş durumdan opacity 1 / transform none durumuna geçti; hizmetler aşağı girişte sırayla görünür oldu, talep bölümüne geçince opacity 0'a sıfırlandı, yukarı dönüşte yeniden animasyon başladı ve tamamlandı. Süreç adımları da görünür durumda opacity 1 / transform none ile doğrulandı.
+- Otomatik doğrulama: 36 test geçti; lint, TypeScript ve üretim build başarılı. Bu kontrol için talep kaydı oluşturulmadı.
+

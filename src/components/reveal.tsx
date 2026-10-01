@@ -31,7 +31,8 @@ export default function Reveal({
   const reducedMotion = useReducedMotion();
   return (
     <motion.div
-      initial={false}
+      data-scroll-reveal
+      initial={reducedMotion ? "visible" : "hidden"}
       whileInView="visible"
       viewport={{ once: false, amount: 0.12 }}
       variants={reducedMotion ? { visible: { opacity: 1, x: 0, y: 0, scale: 1 } } : directions[variant]}

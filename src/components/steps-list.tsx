@@ -23,7 +23,7 @@ export default function StepsList({ steps }: { steps: StepItem[] }) {
   return (
     <motion.ol
       className="steps-list"
-      initial={false}
+      initial={reducedMotion ? "visible" : "hidden"}
       whileInView="visible"
       viewport={{ once: false, amount: 0.2 }}
       variants={listVariants}
@@ -31,6 +31,7 @@ export default function StepsList({ steps }: { steps: StepItem[] }) {
       {steps.map((step) => (
         <motion.li
           className="step"
+          data-scroll-reveal
           key={step.number}
           variants={stepVariants}
           transition={{ duration: reducedMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}

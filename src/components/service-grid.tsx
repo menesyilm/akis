@@ -19,14 +19,15 @@ export default function ServiceGrid({ services }: { services: ServiceItem[] }) {
   return (
     <motion.div
       className="service-grid"
-      initial={false}
+      initial={reducedMotion ? "visible" : "hidden"}
       whileInView="visible"
       viewport={{ once: false, amount: 0.15 }}
-      transition={{ staggerChildren: 0.12 }}
+      variants={{ hidden: {}, visible: { transition: { staggerChildren: reducedMotion ? 0 : 0.12 } } }}
     >
       {services.map((service) => (
         <motion.article
           className="service-card"
+          data-scroll-reveal
           key={service.number}
           variants={cardVariants}
           transition={{ duration: reducedMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
